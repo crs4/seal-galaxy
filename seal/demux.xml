@@ -1,0 +1,44 @@
+<tool id="seal_demux" name="Demux" version="0.4.0-devel">
+	<description>Demultiplex Illumina runs on Hadoop</description>
+
+	<command interpreter="python">
+		seal_galaxy.py
+		--append-python-path /ELS/els3/pireddu/seal/seal_bin/lib/python2.7/site-packages
+		--input $input_data
+		--output $output1
+		--conf seal_galaxy_conf.yaml
+		seal_demux
+		--sample-sheet $sample_sheet
+		--mismatches $mismatches
+		--num-reducers $num_reducers
+	</command>
+
+  <inputs>
+    <param name="input_data" type="data" format="qseq" label="Source path(s)"/>
+		<param name="sample_sheet" type="data" format="csv" label="Sample sheet" />
+		<param name="mismatches"
+			label="Barcode base mismatch limit"
+			type="integer"
+			value="0"
+			min="0"
+			max="3" />
+		<param name="num_reducers"
+			label="Number of reduce tasks"
+			type="integer"
+			value="90"
+			min="1"
+			/>
+  </inputs>
+
+  <outputs>
+    <data name="output1" type="tabular" />
+  </outputs>
+
+	<stdio>
+		<exit_code range="1:" level="fatal" />
+	</stdio>
+
+  <help>
+		Demux is a Hadoop utility to demultiplex data from multiplexed Illumina runs.
+  </help>
+</tool>

@@ -1,0 +1,5 @@
+seal_bin_path: /ELS/els3/pireddu/seal/seal_bin/bin
+HADOOP_HOME: /home/pireddu/Programs/hadoop-1.0.2
+#HADOOP_CONF_DIR: 
+tool_env: # environment variables specifically for the tools to be run
+  PYTHONPATH: /ELS/els3/pireddu/seal/seal_bin/lib/python2.7/site-packages
