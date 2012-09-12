@@ -76,17 +76,17 @@ class SealToolRunner(object):
     if self.output_str is None:
       raise RuntimeError("output path not set!")
 
+    # look for the tool, either in seal_bin_path or in PATH
     if self.conf.has_key('seal_bin_path'):
       tool = os.path.join(self.conf['seal_bin_path'], self.tool)
+      if not os.access(tool, os.X_OK):
+        raise RuntimeError("The tool %s either doesn't exist or isn't executable" % tool)
     else:
       tool = self.tool
+      if not any(os.access(os.path.join(p, tool), os.X_OK)
+          for p in os.environ.get('PATH', '').split(os.pathsep)):
+        raise RuntimeError("The tool %s either isn't in the PATH or isn't executable. PATH: %s" % (tool, os.environ.get('PATH', '')))
 
-    # These checks can't be implement this simply to support using the
-    # PATH variable.
-    #if not os.path.exists(tool):
-    #  raise RuntimeError("%s is not in configured seal bin path %s" % (options.tool, self.conf['seal_bin_path']))
-    #elif not os.access(tool, os.X_OK):
-    #  raise RuntimeError("Tool %s is not executable" % tool)
     return [tool] + self.generic_opts + self.input_params + [self.output_str]
 
   def make_env(self):
@@ -100,6 +100,7 @@ class SealToolRunner(object):
     return env
 
   def execute(self, log):
+    log.debug("seal_bin_path is %s", self.conf.get('seal_bin_path'))
     cmd = self.command()
     env = self.make_env()
     log.debug("attempt to remove output path %s", self.output_str)
