@@ -4,7 +4,11 @@
 	<command interpreter="python">
 		seal_galaxy.py
 		--append-python-path /ELS/els3/pireddu/seal/seal_bin/lib/python2.7/site-packages
-		--conf /home/pireddu/Projects/galaxy-dist.git/tools/seal/seal_galaxy_conf.yaml
+    #import os
+    #set $exists = os.path.exists(os.path.join($GALAXY_DATA_INDEX_DIR, "seal_galaxy_conf.yaml"))
+    #if $exists
+    --conf ${GALAXY_DATA_INDEX_DIR}/seal_galaxy_conf.yaml
+    #end if
 		--input $input_data
 		--output $output1
 		seal_demux
