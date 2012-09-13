@@ -4,16 +4,50 @@ import argparse
 import copy
 import logging
 import os
-import random
 import shlex
-import shutil
 import subprocess
 import sys
 import urlparse
 import yaml
 
+from pathset import FilePathset
+
 class SealToolRunner(object):
+  """
+  Implements the logic necessary to run a Hadoop-based Seal tool from
+  within Galaxy.
+
+  There are two reasons why this class is necessary.
+
+  The first is that typical Hadoop programs produce an output directory
+  containing many files.  Galaxy, on the other hand, better supports the case
+  where a tool reads one input file and produces an output file.  It also
+  supports multiple output files, but it seems to insist on trying to open the
+  main output path as a file (which causes a problem since Hadoop produces a
+  directory).
+
+  The second issue is that, since Hadoop programs usually process large data sets
+  and often operate on HDFS, one may not want to store those data sets in the Galaxy
+  'file_path' directory (its configured data set location).
+
+  To address these issues, we create a level of indirection.  The SealToolRunner reads
+  as input a FilePathset and produces a FilePathset.  These are the job data sets, as far
+  as Galaxy is concerned.  These Pathsets contain URIs to the real data files.  In turn,
+  SealToolRunner invokes the Hadoop-based program providing it with the contents of the
+  input Pathset as input paths, and recording its output directory in an output FilePathset
+  (the output data set provided to Galaxy).
+
+  The SealToolRunner also sets up the necessary Hadoop environment and forwards unrecognized
+  arguments down to the actual tool executable.
+  """
+
   def __init__(self, tool_name):
+    """
+    Initialize a SealToolRunner for a specific tool.
+
+    tool_name will be used as the executable name.
+
+    """
     self.tool = tool_name
     # a list of input paths, potentially containing wildcards that will be expanded by hadoop
     self.input_params = None
@@ -33,14 +67,20 @@ class SealToolRunner(object):
       )
 
   def set_conf(self, conf):
+    """
+    Set the dict object to use for configuration values.
+    """
     self.conf = conf
 
   def sanitize_path(self, path):
     """
-    Turns a path into a full URI, if it's not already.  For now we're assuming all paths
-    are on the local file system (no HDFS).
+    Turns a path into a full URI, if it's not already.  This method is applied
+    to the input and output paths passed to the Hadoop command.  At the moment
+    we're assuming all paths that don't specify a scheme are on the local file
+    system (file://).
 
-    How to support multiple file systems?
+    TODO:  consider incomplete URI's to be on the configured default file
+    system instead of file://
     """
     url = urlparse.urlparse(path)
     if url.scheme: # empty string if now available
@@ -50,25 +90,47 @@ class SealToolRunner(object):
 
   def set_input(self, input_params):
     """
-    Input: a string that can be parsed as a list of input paths.
-    We split the string with shlex.split as to properly pass the
-    input arguments to the program to be called.
+    Set the input paths for the Hadoop command.
+
+    input_params: an iterable or a string that can be parsed as a list of input
+    paths.  We split the string with shlex.split as to properly pass the input
+    arguments to the program to be called.
     """
-    self.input_params = map(self.sanitize_path, shlex.split(input_params))
+    if isinstance(input_params, basestring):
+      self.input_params = map(self.sanitize_path, shlex.split(input_params))
+    else:
+      self.input_params = map(self.sanitize_path, input_params)
 
   def set_output(self, output_str):
+    """
+    Set the output path for the Hadoop command.
+
+    The parameter output_str is expected to be a string.  It will be
+    "sanitized" as per the rules applied by the sanitize_path method.
+    """
     self.output_str = self.sanitize_path(output_str)
 
   def parse_args(self, args_list):
     """
-    Gets the remainder of the arguments, split by argparse. In its simplest form,
-    this method saves the arguments and passes them to as options to
-    the Seal tool (placing them between the command name and the input
-    path.
+    Gets the remainder of the arguments, split by argparse and sets them to
+    self.generic_opts.  The arguments will be passed to the Hadoop tool as
+    generic options (placed them between the command name and the input path.
+
+    This method can be overridden to implement more sophisticated parsing
+    strategies.
     """
     self.generic_opts = args_list
 
   def command(self):
+    """
+    Returns the arguments array to run this Hadoop command.
+
+    The returned array can be passed to subprocess.call and friends.
+
+    This method checks the 'seal_bin_path' configuration value and the PATH environment
+    variable to see if it can find the tool to be run.  It also verifis that the input
+    and output parameters have been set.
+    """
     if self.tool is None:
       raise RuntimeError("tool name not set!")
     if self.input_params is None:
@@ -90,6 +152,16 @@ class SealToolRunner(object):
     return [tool] + self.generic_opts + self.input_params + [self.output_str]
 
   def make_env(self):
+    """
+    Returns a dict containing the environment for the tool to be run.
+
+    This method starts by copying the current environment.  If the tool_env
+    configuration key is set, then it's expected to be a dict who's key-value
+    pairs will become variable-value settings in the new environment dict.
+
+    Subclasses can override this method to implement their own behaviour
+    relating to the environment set for the Hadoop program to be run.
+    """
     tool_env = self.conf.get('tool_env')
     if tool_env is not None:
       env = copy.copy(os.environ.data)
@@ -100,6 +172,12 @@ class SealToolRunner(object):
     return env
 
   def execute(self, log):
+    """
+    Executes the command.
+
+    This method calls self.command to build the command array, calls
+    self.make_env to create its environment, and then executes.
+    """
     log.debug("seal_bin_path is %s", self.conf.get('seal_bin_path'))
     cmd = self.command()
     env = self.make_env()
@@ -111,10 +189,22 @@ class SealToolRunner(object):
       log.warning(e)
     except ImportError:
       log.warning("Failed to import pydoop.hdfs: %s", str(e))
+
+    if not phdfs.path.exists(phdfs.path.dirname(self.output_str)):
+      phdfs.mkdir(phdfs.path.dirname(self.output_str))
+      log.debug("Created parent of output directory")
+
     log.debug("Executing command: %s", cmd)
     subprocess.check_call(cmd, env=env)
 
+
 class SealDemuxRunner(SealToolRunner):
+  """
+  Specialized class to run the seal_demux command.
+
+  The specialization implements support for the --sample-sheet argument, since
+  it's path is passed to Hadoop and thus needs to be a complete URI.
+  """
   def __init__(self):
     super(type(self), self).__init__('seal_demux')
 
@@ -124,7 +214,7 @@ class SealDemuxRunner(SealToolRunner):
       sample_sheet_idx = self.generic_opts.index("--sample-sheet")
       # the following argument should be the path to the sample sheet
       if sample_sheet_idx + 1 >= len(self.generic_opts):
-        raise RuntimeError("Missing argumetn to --sample-sheet")
+        raise RuntimeError("Missing argument to --sample-sheet")
       # sanitize this path, assuming it's a local path
       path_idx = sample_sheet_idx + 1
       self.generic_opts[path_idx] = self.sanitize_path(self.generic_opts[path_idx])
@@ -145,7 +235,7 @@ class SealSeqalRunner(SealToolRunner):
     raise NotImplementedError()
 
 
-class RunnerFactory(object):
+class SealGalaxy(object):
   Runners = {
     'seal_bwa_index_to_mmap': SealToolRunner('seal_bwa_index_to_mmap'),
     'seal_demux':             SealDemuxRunner(),
@@ -160,21 +250,6 @@ class RunnerFactory(object):
     'seal_version':           SealToolRunner('seal_version'),
   }
 
-  def __init__(self, conf):
-    self.conf = conf
-
-  def get_runner(self, tool_name, input_path, output_path, args):
-    r = self.Runners.get(tool_name)
-    if r is None:
-      raise IndexError("Unknown seal tool %s" % tool_name)
-    r.set_conf(self.conf)
-    r.set_input(input_path)
-    r.set_output(output_path)
-    r.parse_args(args)
-    return r
-
- 
-class SealGalaxy(object):
   def __init__(self):
     self.parser = argparse.ArgumentParser(description="Wrap Hadoop-based Seal tools to run within Galaxy")
     self.parser.add_argument('tool', metavar="SealExecutable", help="Seal program to run")
@@ -182,11 +257,25 @@ class SealGalaxy(object):
     self.parser.add_argument('--output', metavar="OutputPath", help="Output path provided by Galaxy")
     self.parser.add_argument('--append-python-path', metavar="PATH",
         help="Path to append to the PYTHONPATH before calling the Seal executable")
-    self.parser.add_argument('--working-dir', metavar="PATH",
+    self.parser.add_argument('--output-dir', metavar="PATH",
         help="URI to a working directory, if different from the Galaxy default. See the documentation for details.")
     self.parser.add_argument('--conf', metavar="SealConf", help="Seal+Galaxy configuration file")
     self.parser.add_argument('remaining_args', nargs=argparse.REMAINDER)
     logging.basicConfig(level=logging.DEBUG)
+
+  def get_runner(self, tool_name, input_pathset, output_pathset, args):
+    r = self.Runners.get(tool_name)
+    if r is None:
+      raise IndexError("Unknown seal tool %s" % tool_name)
+    r.set_conf(self.conf)
+    r.set_input(input_pathset.get_paths())
+    opath = output_pathset.get_paths()
+    if len(opath) != 1:
+      raise RuntimeError("Unexpected output path list length %d" % len(opath))
+    r.set_output(opath[0])
+    r.parse_args(args)
+    return r
+
 
   def set_hadoop_conf(self):
     """
@@ -199,11 +288,27 @@ class SealGalaxy(object):
     if self.conf.has_key('HADOOP_CONF_DIR'):
       os.environ['HADOOP_CONF_DIR'] = self.conf['HADOOP_CONF_DIR']
 
-  def run(self):
-    options = self.parser.parse_args(args=sys.argv[1:]) # parse args, skipping the program name
-    self.log = logging.getLogger(options.tool or 'Seal')
-    self.log.debug("options: %s", options)
+  def gen_output_path(self, options, name=None):
+    if name:
+      suffix_path = name
+    else:
+      # We'll use the name of the output file as the name of the data file,
+      # knowing that the datapath (below) will be calculated as to not put data
+      # and pathset file in the same place.
+      suffix_path = os.path.basename(options.output)
 
+    if os.path.abspath(options.output_dir) == os.path.abspath(os.path.dirname(options.output)):
+      # If pathset output and data are being written to the same directory,
+      # put the data in a 'hadoop_output' subdirectory.
+      datapath = os.path.join(options.output_dir, 'hadoop_output')
+      self.log.debug("Data output directory same as pathset output directory.")
+    else:
+      datapath = options.output_dir
+    p = os.path.join(datapath, suffix_path)
+    self.log.info("Generated data output path %s", p)
+    return p
+
+  def __configure_myself(self, options):
     if not options.conf:
       self.conf = dict()
     else:
@@ -218,7 +323,6 @@ class SealGalaxy(object):
         sys.exit(1)
 
     self.set_hadoop_conf()
-    import pydoop.hdfs
 
     if self.log.isEnabledFor(logging.INFO):
       self.log.info("Hadoop settings:")
@@ -226,16 +330,20 @@ class SealGalaxy(object):
         if k.startswith("HADOOP"):
           self.log.info("%s = %s", k, v)
 
-    self.log.debug("Creating runner factory with conf %s", self.conf)
-    self.factory = RunnerFactory(self.conf)
-    if self.log.isEnabledFor(logging.DEBUG):
-      self.log.debug("Runner tools: %s", ','.join(self.factory.Runners.iterkeys()))
+  def __run_tool(self, options):
+    with open(options.input) as f:
+      input_pathset = FilePathset.from_file(f)
+      self.log.debug("Read input pathset: %s", input_pathset)
+
+    output_pathset = FilePathset(self.gen_output_path(options))
 
     try:
-      runner = self.factory.get_runner(options.tool, options.input, options.output, options.remaining_args)
+      runner = self.get_runner(options.tool, input_pathset, output_pathset, options.remaining_args)
       self.log.debug("executing runner")
       self.log.debug("%s", runner)
       runner.execute(self.log)
+      with open(options.output, 'w') as f:
+        output_pathset.write(f)
     except IndexError, e:
       self.log.exception(e)
       sys.exit(2)
@@ -248,28 +356,31 @@ class SealGalaxy(object):
     except OSError, e:
       self.log.critical("Execution failed: %s", e)
       sys.exit(1)
- 
+
+  def run(self):
+    options = self.parser.parse_args(args=sys.argv[1:]) # parse args, skipping the program name
+    self.log = logging.getLogger(options.tool or 'Seal')
+
+    if not options.output_dir:
+      # if the output directory isn't specified, use the same
+      # directory as the output file.
+      options.output_dir = os.path.dirname(options.output)
+
+    self.log.debug("options: %s", options)
+
+    if self.log.isEnabledFor(logging.DEBUG):
+      self.log.debug("Runner tools: %s", ','.join(self.Runners.iterkeys()))
+
+    self.__configure_myself(options)
+
+    # try importing pydoop.hdfs and fail here if something goes wrong (probably a problem
+    # with Hadoop-related configuration.
+    import pydoop.hdfs
+
+    self.__run_tool(options)
 
 if __name__ == "__main__":
   wrapper = SealGalaxy()
   wrapper.run()
-
-#hdfs = pydoop.hdfs.hdfs("default", 0)
-#self.log.debug("connected to hdfs at %s", hdfs.host)
-
-
-## hack to read the input path directly from the command line
-##input_paths = [ galaxy_input ]
-#
-#with open(galaxy_input) as f:
-#  input_paths = [ s.rstrip("\n") for s in f.readlines() ]
-#
-#output_path = os.path.join( hdfs.working_directory(), "galaxy-wrapper-%f" % random.random())
-#
-#hdfs.close()
-#log.debug("hdfs closed")
-#
-#with open(galaxy_output, 'w') as f:
-#  f.write(output_path)
 
 # vim: set et ai sw=2 ts=2
