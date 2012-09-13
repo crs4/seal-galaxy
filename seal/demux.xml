@@ -4,9 +4,9 @@
 	<command interpreter="python">
 		seal_galaxy.py
 		--append-python-path /ELS/els3/pireddu/seal/seal_bin/lib/python2.7/site-packages
+		--conf /home/pireddu/Projects/galaxy-dist.git/tools/seal/seal_galaxy_conf.yaml
 		--input $input_data
 		--output $output1
-		--conf seal_galaxy_conf.yaml
 		seal_demux
 		--sample-sheet $sample_sheet
 		--mismatches $mismatches
