@@ -147,7 +147,10 @@ class SealToolRunner(object):
       tool = self.tool
       if not any(os.access(os.path.join(p, tool), os.X_OK)
           for p in os.environ.get('PATH', '').split(os.pathsep)):
-        raise RuntimeError("The tool %s either isn't in the PATH or isn't executable. PATH: %s" % (tool, os.environ.get('PATH', '')))
+        raise RuntimeError(
+          ("The tool %s either isn't in the PATH or isn't executable.\n" +
+           "You may also choose to create a configuration file seal_galaxy_conf.yaml in your\n" +
+           "tool-data path and set seal_bin_path.\nPATH: %s") % (tool, os.environ.get('PATH', '')))
 
     return [tool] + self.generic_opts + self.input_params + [self.output_str]
 
