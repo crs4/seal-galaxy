@@ -1,0 +1,23 @@
+<tool id="make_pathset" name="Make Pathset" version="0.4.0-devel">
+  <description>Create a pathset for a set of files</description>
+
+  <command interpreter="python">
+    make_pathset $filesystem_select $datapath $output_path
+  </command>
+
+  <inputs>
+    <param name="filesystem_select" type="select" label="File system type" default="default">
+      <option value="default">Default</option>
+      <option value="local">Local FS</option>
+    </param>
+    <param name="datapath" type="text" label="Path or URI" size="60" />
+  </inputs>
+
+  <outputs>
+    <data name="output_path" type="data" format="pathset" />
+  </outputs>
+
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>
+</tool>
