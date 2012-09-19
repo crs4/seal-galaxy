@@ -5,6 +5,7 @@ import subprocess
 import sys
 import urlparse
 
+import pydoop
 import pydoop.hdfs as phdfs
 
 from pathset import FilePathset
@@ -90,7 +91,7 @@ def get_paths(datapath_uri):
   try:
     # run -ls with hadoop dfs the process the output.
     # We drop the first line since it's something like "Found xx items".
-    ls_output = subprocess.check_output(['hadoop', 'dfs', '-ls', datapath_uri.geturl()]).rstrip('\n').split('\n')[1:]
+    ls_output = subprocess.check_output([pydoop.hadoop_exec(), 'dfs', '-ls', datapath_uri.geturl()]).rstrip('\n').split('\n')[1:]
     # for each data line, run apply the 'process' function to transform it into a full URI
     return map(process, ls_output)
   except subprocess.CalledProcessError, e:
@@ -104,7 +105,7 @@ if __name__ == "__main__":
   mode, datapath, output_path = sys.argv[1:]
 
   # test the hadoop configuration
-  cmd = ['hadoop', 'dfs', '-ls', '/']
+  cmd = [pydoop.hadoop_exec(), 'dfs', '-ls', 'file:///']
   try:
     subprocess.check_output(cmd)
   except Exception, e:
