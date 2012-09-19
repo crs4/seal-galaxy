@@ -2,7 +2,7 @@
   <description>Create a pathset for a set of files</description>
 
   <command interpreter="python">
-    make_pathset $filesystem_select $datapath $output_path
+    make_pathset $filesystem_select '$datapath' $output_path
   </command>
 
   <inputs>
