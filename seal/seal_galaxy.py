@@ -46,7 +46,6 @@ class SealToolRunner(object):
     Initialize a SealToolRunner for a specific tool.
 
     tool_name will be used as the executable name.
-
     """
     self.tool = tool_name
     # a list of input paths, potentially containing wildcards that will be expanded by hadoop
@@ -83,32 +82,24 @@ class SealToolRunner(object):
     system instead of file://
     """
     url = urlparse.urlparse(path)
-    if url.scheme: # empty string if now available
+    if url.scheme: # empty string if not available
       return path
     else:
       return "file://" + os.path.abspath(path)
 
-  def set_input(self, input_params):
+  def set_input(self, pathset):
     """
     Set the input paths for the Hadoop command.
-
-    input_params: an iterable or a string that can be parsed as a list of input
-    paths.  We split the string with shlex.split as to properly pass the input
-    arguments to the program to be called.
     """
-    if isinstance(input_params, basestring):
-      self.input_params = map(self.sanitize_path, shlex.split(input_params))
-    else:
-      self.input_params = map(self.sanitize_path, input_params)
+    self.input_params = pathset.get_paths()
 
-  def set_output(self, output_str):
+  def set_output(self, pathset):
     """
     Set the output path for the Hadoop command.
-
-    The parameter output_str is expected to be a string.  It will be
-    "sanitized" as per the rules applied by the sanitize_path method.
     """
-    self.output_str = self.sanitize_path(output_str)
+    if len(pathset) != 1:
+      raise RuntimeError("Expecting an output pathset containing one path, but got %d" % len(pathset))
+    self.output_str = iter(pathset).next()
 
   def parse_args(self, args_list):
     """
@@ -271,11 +262,8 @@ class SealGalaxy(object):
     if r is None:
       raise IndexError("Unknown seal tool %s" % tool_name)
     r.set_conf(self.conf)
-    r.set_input(input_pathset.get_paths())
-    opath = output_pathset.get_paths()
-    if len(opath) != 1:
-      raise RuntimeError("Unexpected output path list length %d" % len(opath))
-    r.set_output(opath[0])
+    r.set_input(input_pathset)
+    r.set_output(output_pathset)
     r.parse_args(args)
     return r
 
