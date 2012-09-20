@@ -47,6 +47,12 @@ class Pathset(object):
   def get_paths(self):
     return self.paths
 
+  def __iter__(self):
+    return iter(self.paths)
+
+  def __len__(self):
+    return len(self.paths)
+
   def __str__(self):
     return os.pathsep.join(self.paths)
 
