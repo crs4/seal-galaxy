@@ -1,6 +1,7 @@
 
 import argparse
 import os
+import urlparse
 
 class Pathset(object):
   """
@@ -10,14 +11,37 @@ class Pathset(object):
   Unknown = "Unknown"
 
   def __init__(self, *pathlist):
-    self.paths = pathlist
+    """
+    Create a pathset.  If paths are provided in pathset,
+    they will be sanitized and inserted into the new pathset.
+    """
+    self.paths = map(self.sanitize_path, pathlist)
     self.datatype = self.Unknown
 
   def set_datatype(self, datatype):
     self.datatype = datatype
 
+  def sanitize_path(self, path):
+    """
+    Turns a path into a full URI, if it's not already.  This method is applied
+    to the input and output paths passed to the Hadoop command.  At the moment
+    we're assuming all paths that don't specify a scheme are on the local file
+    system (file://).
+
+    TODO:  consider incomplete URI's to be on the configured default file
+    system instead of file://
+    """
+    url = urlparse.urlparse(path)
+    if url.scheme: # empty string if not available
+      return path
+    else:
+      return "file://" + os.path.abspath(path)
+
   def append(self, p):
-    self.paths.append(p)
+    """
+    Appena a path to this pathset.  The path will be sanitized.
+    """
+    self.paths.append(self.sanitize_path(p))
     return self
 
   def get_paths(self):
