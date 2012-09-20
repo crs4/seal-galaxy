@@ -1,20 +1,16 @@
-<tool id="seal_demux" name="Demux" version="0.4.0-devel">
+<tool id="seal_demux" name="Demux" version="0.4.0-devel" force_history_refresh="True">
   <description>Demultiplex Illumina runs on Hadoop</description>
 
-  <command interpreter="python">
-    seal_galaxy.py
-    --append-python-path /ELS/els3/pireddu/seal/seal_bin/lib/python2.7/site-packages
-    #import os
-    #set $exists = os.path.exists(os.path.join($GALAXY_DATA_INDEX_DIR, "seal_galaxy_conf.yaml"))
-    #if $exists
-      --conf ${GALAXY_DATA_INDEX_DIR}/seal_galaxy_conf.yaml
-    #end if
-    --input $input_data
-    --output $output1
-    seal_demux
-    --sample-sheet $sample_sheet
-    --mismatches $mismatches
-    --num-reducers $num_reducers
+  <command interpreter="bash">
+    demux.sh 
+    $GALAXY_DATA_INDEX_DIR
+    $input_data
+    $mismatches
+    $__new_file_path__
+    $num_reducers
+    $output1
+    $output1.id
+    $sample_sheet
   </command>
 
   <inputs>
@@ -35,7 +31,7 @@
   </inputs>
 
   <outputs>
-    <data name="output1" type="data" format="pathset" />
+    <data name="output1" type="data" format="pathset" label="Demux output root" />
   </outputs>
 
   <stdio>
