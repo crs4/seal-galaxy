@@ -68,7 +68,13 @@ class FilePathset(Pathset):
   @staticmethod
   def from_file(fd):
     retval = FilePathset()
-    retval.read(fd)
+    if not hasattr(fd, 'readline'):
+      # not an I/O object.  Assume it's a file path
+      with open(fd) as io:
+        retval.read(io)
+    else:
+      # assue it's an I/O object and try to read it directly
+      retval.read(fd)
     return retval
 
   def __init__(self, *pathlist):
