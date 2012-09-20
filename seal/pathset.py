@@ -95,7 +95,7 @@ class FilePathset(Pathset):
     self.datatype = field_dict.get(self.DataTypeTag, self.Unknown)
 
   def read(self, fd):
-    header = fd.readline()
+    header = fd.readline().rstrip('\n')
     self.__parse_header(header)
     self.paths = [ line.rstrip('\n') for line in fd.xreadlines() ]
     return self
