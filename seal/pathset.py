@@ -21,7 +21,8 @@ class Pathset(object):
   def set_datatype(self, datatype):
     self.datatype = datatype
 
-  def sanitize_path(self, path):
+  @staticmethod
+  def sanitize_path(path):
     """
     Turns a path into a full URI, if it's not already.  This method is applied
     to the input and output paths passed to the Hadoop command.  At the moment

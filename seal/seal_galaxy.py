@@ -4,13 +4,11 @@ import argparse
 import copy
 import logging
 import os
-import shlex
 import subprocess
 import sys
-import urlparse
 import yaml
 
-from pathset import FilePathset
+from pathset import Pathset, FilePathset
 
 class SealToolRunner(object):
   """
@@ -70,22 +68,6 @@ class SealToolRunner(object):
     Set the dict object to use for configuration values.
     """
     self.conf = conf
-
-  def sanitize_path(self, path):
-    """
-    Turns a path into a full URI, if it's not already.  This method is applied
-    to the input and output paths passed to the Hadoop command.  At the moment
-    we're assuming all paths that don't specify a scheme are on the local file
-    system (file://).
-
-    TODO:  consider incomplete URI's to be on the configured default file
-    system instead of file://
-    """
-    url = urlparse.urlparse(path)
-    if url.scheme: # empty string if not available
-      return path
-    else:
-      return "file://" + os.path.abspath(path)
 
   def set_input(self, pathset):
     """
@@ -211,7 +193,7 @@ class SealDemuxRunner(SealToolRunner):
         raise RuntimeError("Missing argument to --sample-sheet")
       # sanitize this path, assuming it's a local path
       path_idx = sample_sheet_idx + 1
-      self.generic_opts[path_idx] = self.sanitize_path(self.generic_opts[path_idx])
+      self.generic_opts[path_idx] = Pathset.sanitize_path(self.generic_opts[path_idx])
     except ValueError: # raised if we don't find a --sample-sheet argument
       # in this case, we'll let the program go through and let Demux print
       # the appropriate error to the user
@@ -222,11 +204,19 @@ class SealSeqalRunner(SealToolRunner):
   def __init__(self):
     super(type(self), self).__init__('seal_seqal')
 
-  def parse_args(self, args_str):
-    pass
+  def parse_args(self, args_list):
+    # need to sanitize the reference argument.  Should be the last one
+    self.reference_path = Pathset.sanitize_path(args_list[-1])
+    self.generic_opts = args_list[:-1]
 
   def command(self):
-    raise NotImplementedError()
+    """
+    Overrides the default 'command' method by appending the reference path to
+    the end of the returned command array.
+    """
+    cmd = super(type(self), self).command()
+    cmd.append(self.reference_path)
+    return cmd
 
 
 class SealGalaxy(object):
@@ -317,7 +307,7 @@ class SealGalaxy(object):
 
     if self.log.isEnabledFor(logging.INFO):
       self.log.info("Hadoop settings:")
-      for k,v in os.environ.iteritems():
+      for k, v in os.environ.iteritems():
         if k.startswith("HADOOP"):
           self.log.info("%s = %s", k, v)
 
@@ -374,4 +364,4 @@ if __name__ == "__main__":
   wrapper = SealGalaxy()
   wrapper.run()
 
-# vim: set et ai sw=2 ts=2
+# vim: expandtab autoindent shiftwidth=2 tabstop=2
