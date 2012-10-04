@@ -1,0 +1,80 @@
+<tool id="seal_recab_table" name="Recab Table" version="0.4.0-devel">
+  <description>Calculate a base quality recalibration table on Hadoop.</description>
+
+  <command interpreter="python">
+    recab_table_galaxy.py
+    $GALAXY_DATA_INDEX_DIR
+    $input_data
+    $output1
+    $vcf
+    $num_reducers
+
+    #if $default_rg:
+    -D seal.recab.rg-covariate.default-rg=$default_rg
+    #end if
+
+    #if $smoothing:
+    -D seal.recab.smoothing=$smoothing
+    #end if 
+
+    #if $max_qscore:
+    -D seal.recab.max-qscore=$max_qscore
+    #end if
+  </command>
+
+  <inputs>
+    <param name="input_data" type="data" format="pathset" label="Input data" />
+    <param name="input_format" type="select" label="Input format" default="sam">
+      <option value="sam" />
+      <option value="bam" />
+    </param>
+
+    <param name="vcf" type="select" label="VCF file" >
+      <options from_file="variant_tables.loc">
+        <column name="name" index="1"/> <!-- display name -->
+        <column name="value" index="2"/> <!-- URI -->
+      </options>
+    </param>
+
+    <param name="num_reducers"
+      label="Number of reduce tasks"
+      type="integer"
+      value="90"
+      min="1"
+      />
+
+    <!-- recab-specific parameters -->
+    <param name="default_rg"
+      label="Default read group"
+      type="text"
+      help="Read group to assign to mappings without an RG tag. This value is mandatory if your data includes mappings that do not have a read group tag (RG) Seal RecabTable property: seal.recab.rg-covariate.default-rg."
+      />
+    <param name="smoothing"
+      label="Smoothing"
+      type="integer"
+      value="0"
+      help="Smoothing parameter for empirical quality calculation. Seal RecabTable property: seal.recab.smoothing."
+      min="0"
+      />
+    <param name="max_qscore"
+      label="Max quality score"
+      type="integer"
+      value="40"
+      min="1"
+      help="Upper limit for the empirical quality scores. Seal RecabTable property: seal.recab.max-qscore."
+      />
+  </inputs>
+
+  <outputs>
+    <data name="output1" type="data" format="csv" />
+  </outputs>
+
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>
+
+  <help>
+RecabTable is a Hadoop program to calculate a table of base qualities for all values of a given set of factors. It computes a result equivalent to the GATK CountCovariatesWalker.
+For the full help see the `manual &lt;http://biodoop-seal.sourceforge.net/recab_table_index.html&gt;`_.
+  </help>
+</tool>
