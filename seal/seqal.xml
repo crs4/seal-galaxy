@@ -1,0 +1,63 @@
+<tool id="seal_seqal" name="Seqal" version="0.4.0-devel">
+  <description>Map reads on Hadoop</description>
+
+  <command interpreter="python">
+    seal_galaxy.py
+    #import os
+    #set $exists = os.path.exists(os.path.join($GALAXY_DATA_INDEX_DIR, "seal_galaxy_conf.yaml"))
+    #if $exists
+      --conf ${GALAXY_DATA_INDEX_DIR}/seal_galaxy_conf.yaml
+    #end if
+    --input $input_data
+    --output $output1
+    seal_seqal
+    #if $align_only.value:
+      --align-only --num-reducers 0
+    #else
+      --num-reducers $align_only.num_reducers
+    #end if
+    --trimq $trimq
+    $reference
+  </command>
+
+  <inputs>
+    <param name="input_data" type="data" format="pathset" label="Input data" />
+
+    <param name="reference" type="select" label="Reference">
+      <options from_file="references.loc">
+        <column name="name" index="1"/> <!-- display name -->
+        <column name="value" index="2"/> <!-- URI -->
+      </options>
+    </param>
+
+    <param name="trimq" type="integer" min="0" value="0" label="trim quality, like BWA’s -q argument" />
+
+    <conditional name="align_only">
+      <param name="value" type="boolean" default="false" label="Align only (don't identify duplicates)" />
+      <when value="false">
+        <param name="num_reducers"
+          label="Number of reduce tasks"
+          type="integer"
+          value="90"
+          min="1"
+          />
+      </when>
+    </conditional>
+  </inputs>
+
+  <outputs>
+    <data name="output1" type="data" format="pathset" />
+  </outputs>
+
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>
+
+  <help>
+    Seqal is a distributed short read mapping and duplicate removal tool. It
+    implements a distributed version of the BWA aligner, and adds a duplicate
+    read identification feature using the same criteria as the Picard
+    MarkDuplicates command.  For a full description see the `manual
+    &lt;http://biodoop-seal.sourceforge.net/seqal_index.html&gt;`_.
+  </help>
+</tool>
