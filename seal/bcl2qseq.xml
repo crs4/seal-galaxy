@@ -1,0 +1,52 @@
+<tool id="bcbb_bcl2qseq" name="Dist Bcl2Qseq" version="0.1.0">
+  <description>Convert Illumina bcl files to qseq on Hadoop</description>
+
+  <command interpreter="python">
+    seal_galaxy.py
+    #import os
+    #set $exists = os.path.exists(os.path.join($GALAXY_DATA_INDEX_DIR, "seal_galaxy_conf.yaml"))
+    #if $exists
+     --conf ${GALAXY_DATA_INDEX_DIR}/seal_galaxy_conf.yaml
+    #end if
+    --input $input_data
+    --output $output1
+    dist_bcl2qseq.py
+    #if $modules:
+      -m "$modules"
+    #end if
+    #if $advanced.control == 'show' and $advanced.bcl2qseq_bin:
+    --bclToQseq-path $advanced.bcl2qseq_bin
+    #end if
+  </command>
+
+  <inputs>
+    <param name="input_data" type="data" format="pathset" label="Source data set"/>
+    <param name="modules" type="text" label="modules to load before running bclToQseq (optional)" />
+    <conditional name="advanced">
+      <param name="control" type="select" label="Advanced controls" default="hide">
+        <option value="hide">Hide</option>
+        <option value="show">Show</option>
+      </param>
+      <when value="show">
+        <param name="bcl2qseq_bin"
+          type="text"
+          default=""
+          size="80"
+          label="Full path to bclToQseq binary (needed only if the executable isn't in the PATH)"
+          />
+      </when>
+    </conditional>
+  </inputs>
+
+  <outputs>
+    <data name="output1" type="data" format="pathset" label="Qseq" />
+  </outputs>
+
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>
+
+  <help>
+    This is a Pydoop-based distributed version of Illumina's bclToQseq tool.
+  </help>
+</tool>
