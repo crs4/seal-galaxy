@@ -105,7 +105,7 @@ if __name__ == "__main__":
   mode, datapath, output_path = sys.argv[1:]
 
   # test the hadoop configuration
-  cmd = [pydoop.hadoop_exec(), 'dfs', '-ls', 'file:///']
+  cmd = [pydoop.hadoop_exec(), 'dfs', '-stat', 'file:///']
   try:
     subprocess.check_output(cmd)
   except Exception, e:
