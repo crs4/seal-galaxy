@@ -10,7 +10,7 @@ import yaml
 
 from pathset import Pathset, FilePathset
 
-class SealToolRunner(object):
+class HadoopToolRunner(object):
   """
   Implements the logic necessary to run a Hadoop-based Seal tool from
   within Galaxy.
@@ -28,14 +28,14 @@ class SealToolRunner(object):
   and often operate on HDFS, one may not want to store those data sets in the Galaxy
   'file_path' directory (its configured data set location).
 
-  To address these issues, we create a level of indirection.  The SealToolRunner reads
+  To address these issues, we create a level of indirection.  The HadoopToolRunner reads
   as input a FilePathset and produces a FilePathset.  These are the job data sets, as far
   as Galaxy is concerned.  These Pathsets contain URIs to the real data files.  In turn,
-  SealToolRunner invokes the Hadoop-based program providing it with the contents of the
+  HadoopToolRunner invokes the Hadoop-based program providing it with the contents of the
   input Pathset as input paths, and recording its output directory in an output FilePathset
   (the output data set provided to Galaxy).
 
-  The SealToolRunner also sets up the necessary Hadoop environment and forwards unrecognized
+  The HadoopToolRunner also sets up the necessary Hadoop environment and forwards unrecognized
   arguments down to the actual tool executable.
   """
 
@@ -111,21 +111,19 @@ class SealToolRunner(object):
     if self.output_str is None:
       raise RuntimeError("output path not set!")
 
-    # look for the tool, either in seal_bin_path or in PATH
-    if self.conf.has_key('seal_bin_path'):
-      tool = os.path.join(self.conf['seal_bin_path'], self.tool)
-      if not os.access(tool, os.X_OK):
-        raise RuntimeError("The tool %s either doesn't exist or isn't executable" % tool)
-    else:
-      tool = self.tool
-      if not any(os.access(os.path.join(p, tool), os.X_OK)
-          for p in os.environ.get('PATH', '').split(os.pathsep)):
-        raise RuntimeError(
-          ("The tool %s either isn't in the PATH or isn't executable.\n" +
-           "You may also choose to create a configuration file seal_galaxy_conf.yaml in your\n" +
-           "tool-data path and set seal_bin_path.\nPATH: %s") % (tool, os.environ.get('PATH', '')))
+    # if tool_bin_path is set, prepend it to the PATH
+    if self.conf.has_key('tool_bin_path'):
+      os.environ['PATH'] = self.conf['tool_bin_path'] + os.pathsep + os.environ.get('PATH', '')
 
-    return [tool] + self.generic_opts + self.input_params + [self.output_str]
+    # now verify that we find the executable in the PATh
+    if not any(os.access(os.path.join(p, self.tool), os.X_OK)
+        for p in os.environ.get('PATH', '').split(os.pathsep)):
+      raise RuntimeError(
+        ("The tool %s either isn't in the PATH or isn't executable.\n" +
+         "You may also choose to create a configuration file seal_galaxy_conf.yaml in your\n" +
+         "tool-data path and set seal_bin_path.\nPATH: %s") % (self.tool, os.environ.get('PATH', '')))
+
+    return [self.tool] + self.generic_opts + self.input_params + [self.output_str]
 
   def make_env(self):
     """
@@ -154,7 +152,7 @@ class SealToolRunner(object):
     This method calls self.command to build the command array, calls
     self.make_env to create its environment, and then executes.
     """
-    log.debug("seal_bin_path is %s", self.conf.get('seal_bin_path'))
+    log.debug("tool_bin_path is %s", self.conf.get('tool_bin_path'))
     cmd = self.command()
     env = self.make_env()
     log.debug("attempt to remove output path %s", self.output_str)
@@ -172,6 +170,13 @@ class SealToolRunner(object):
 
     log.debug("Executing command: %s", cmd)
     subprocess.check_call(cmd, env=env)
+
+
+class SealToolRunner(HadoopToolRunner):
+  """
+  Super class for any specialized seal tool runners
+  """
+  pass
 
 
 class SealDemuxRunner(SealToolRunner):
@@ -219,19 +224,20 @@ class SealSeqalRunner(SealToolRunner):
     return cmd
 
 
-class SealGalaxy(object):
+class HadoopGalaxy(object):
   Runners = {
-    'seal_bwa_index_to_mmap': SealToolRunner('seal_bwa_index_to_mmap'),
+    'seal_bwa_index_to_mmap': HadoopToolRunner('seal_bwa_index_to_mmap'),
     'seal_demux':             SealDemuxRunner(),
-    'seal_distcp_files':      SealToolRunner('seal_distcp_files'),
-    'seal_merge_alignments':  SealToolRunner('seal_merge_alignments'),
-    'seal_prq':               SealToolRunner('seal_prq'),
-    'seal_read_sort':         SealToolRunner('seal_read_sort'),
-    'seal_recab_table':       SealToolRunner('seal_recab_table'),
-    'seal_recab_table_fetch': SealToolRunner('seal_recab_table_fetch'),
+    'seal_distcp_files':      HadoopToolRunner('seal_distcp_files'),
+    'seal_merge_alignments':  HadoopToolRunner('seal_merge_alignments'),
+    'seal_prq':               HadoopToolRunner('seal_prq'),
+    'seal_read_sort':         HadoopToolRunner('seal_read_sort'),
+    'seal_recab_table':       HadoopToolRunner('seal_recab_table'),
+    'seal_recab_table_fetch': HadoopToolRunner('seal_recab_table_fetch'),
     'seal_seqal':             SealSeqalRunner(),
-    'seal_tsvsort':           SealToolRunner('seal_tsvsort'),
-    'seal_version':           SealToolRunner('seal_version'),
+    'seal_tsvsort':           HadoopToolRunner('seal_tsvsort'),
+    'seal_version':           HadoopToolRunner('seal_version'),
+    'dist_bcl2qseq.py':       HadoopToolRunner('dist_bcl2qseq.py'),
   }
 
   def __init__(self):
@@ -361,7 +367,7 @@ class SealGalaxy(object):
     self.__run_tool(options)
 
 if __name__ == "__main__":
-  wrapper = SealGalaxy()
+  wrapper = HadoopGalaxy()
   wrapper.run()
 
 # vim: expandtab autoindent shiftwidth=2 tabstop=2
