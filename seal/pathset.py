@@ -107,4 +107,4 @@ class FilePathset(Pathset):
       fd.write(p)
       fd.write('\n')
 
-# vim: set et ai sw=2 ts=2
+# vim: expandtab autoindent shiftwidth=2 tabstop=2
