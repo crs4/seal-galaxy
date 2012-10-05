@@ -1,8 +1,8 @@
 <tool id="seal_demux" name="Demux" version="0.4.0-devel" force_history_refresh="True">
   <description>Demultiplex Illumina runs on Hadoop</description>
 
-  <command interpreter="bash">
-    demux.sh 
+  <command interpreter="python">
+    demux_galaxy.py
     $GALAXY_DATA_INDEX_DIR
     $input_data
     $mismatches
