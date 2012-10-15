@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<toolbox>
+  <section name="Sequencing pipeline" id="seq">
+    <tool file="seal/get_sample_sheet_from_run_dir.xml" />
+  </section>
+  <section name="Seal" id="seal">
+    <tool file="seal/make_pathset.xml" />
+    <tool file="seal/bcl2qseq.xml" />
+    <tool file="seal/demux.xml" />
+    <tool file="seal/prq.xml" />
+    <tool file="seal/seqal.xml" />
+    <tool file="seal/recab_table.xml" />
+  </section>
+</toolbox>
