@@ -116,14 +116,19 @@ class HadoopToolRunner(object):
       os.environ['PATH'] = self.conf['tool_bin_path'] + os.pathsep + os.environ.get('PATH', '')
 
     # now verify that we find the executable in the PATh
-    if not any(os.access(os.path.join(p, self.tool), os.X_OK)
-        for p in os.environ.get('PATH', '').split(os.pathsep)):
+    try:
+      full_path =\
+        next(os.path.join(p, self.tool)
+             for p in os.environ.get('PATH', '').split(os.pathsep)
+             if os.access(os.path.join(p, self.tool), os.X_OK))
+    except StopIteration:
       raise RuntimeError(
         ("The tool %s either isn't in the PATH or isn't executable.\n" +
          "You may also choose to create a configuration file seal_galaxy_conf.yaml in your\n" +
          "tool-data path and set seal_bin_path.\nPATH: %s") % (self.tool, os.environ.get('PATH', '')))
 
-    return [self.tool] + self.generic_opts + self.input_params + [self.output_str]
+    logging.getLogger(self.__class__.__name__).debug("Found tool: %s", full_path)
+    return [full_path] + self.generic_opts + self.input_params + [self.output_str]
 
   def make_env(self):
     """
@@ -169,6 +174,7 @@ class HadoopToolRunner(object):
       log.debug("Created parent of output directory")
 
     log.debug("Executing command: %s", cmd)
+    log.debug("PATH: %s", env.get('PATH'))
     subprocess.check_call(cmd, env=env)
 
 
