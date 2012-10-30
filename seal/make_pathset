@@ -25,7 +25,7 @@ class Uri(object):
     if self.scheme == 'file':
       if self.netloc:
         raise ValueError("Can't specify a netloc with file: scheme")
-      if self.path and not self.path.starswith('/'):
+      if self.path and not self.path.startswith('/'):
         raise ValueError("Must use absolute paths with file: scheme (found %s)" % self.path)
     if self.netloc and not self.scheme:
       raise ValueError("Can't specify a host without an access scheme")
