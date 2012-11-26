@@ -58,7 +58,7 @@ def resolve_datapath(mode, datapath):
   u = Uri(urlparse.urlparse(datapath))
 
   if not u.path:
-    raise RuntimeError("missing path in data path %s" % datapath)
+    raise RuntimeError("blank path in %s" % datapath)
 
   if mode == 'default' and not u.scheme: # datapath not specified completely. Assume it's on the default fs
     u = Uri(urlparse.urlparse(phdfs.path.abspath(u.path)))
