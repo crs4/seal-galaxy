@@ -95,7 +95,8 @@ def get_paths(datapath_uri):
     # for each data line, run apply the 'process' function to transform it into a full URI
     return map(process, ls_output)
   except subprocess.CalledProcessError, e:
-    print >>sys.stderr, "Could not list datapath %s.  Please check whether it exists" % datapath_uri.geturl()
+    print >> sys.stderr, "Could not list datapath %s.  Please check whether it exists" % datapath_uri.geturl()
+    print >> sys.stderr, "Message:", str(e)
     sys.exit(1)
   
 
@@ -109,7 +110,8 @@ if __name__ == "__main__":
   try:
     subprocess.check_output(cmd)
   except subprocess.CalledProcessError, e:
-    print >>sys.stderr, "Error running hadoop program.  Please check your environment (tried %s)" % ' '.join(cmd)
+    print >> sys.stderr, "Error running hadoop program.  Please check your environment (tried %s)" % ' '.join(cmd)
+    print >> sys.stderr, "Message:", str(e)
     sys.exit(2)
 
   if mode not in ValidModes:
