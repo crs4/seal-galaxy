@@ -108,7 +108,7 @@ if __name__ == "__main__":
   cmd = [pydoop.hadoop_exec(), 'dfs', '-stat', 'file:///']
   try:
     subprocess.check_output(cmd)
-  except Exception, e:
+  except subprocess.CalledProcessError, e:
     print >>sys.stderr, "Error running hadoop program.  Please check your environment (tried %s)" % ' '.join(cmd)
     sys.exit(2)
 
