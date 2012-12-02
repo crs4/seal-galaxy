@@ -15,6 +15,9 @@ by Demux.
 #    OUTPUT1
 #    OUTPUT_ID
 #    SAMPLE_SHEET
+#    INPUT_FORMAT
+#    OUTPUT_FORMAT
+#    OUTPUT_COMPRESSION
 
 import os
 import subprocess
@@ -23,15 +26,16 @@ import sys
 # XXX: add --append-python-path to the possible arguments?
 
 def usage_error(msg=None):
+  print >> sys.stderr, "Usage error"
   if msg:
     print >> sys.stderr, msg
-  print >> sys.stderr, os.path.basename(sys.argv[0]),\
-    "GALAXY_DATA_INDEX_DIR INPUT_DATA MISMATCHES NEW_FILE_PATH NUM_REDUCERS OUTPUT1 OUTPUT_ID SAMPLE_SHEET"
+  print >> sys.stderr, "Usage:", os.path.basename(sys.argv[0]),\
+    "GALAXY_DATA_INDEX_DIR INPUT_DATA MISMATCHES NEW_FILE_PATH NUM_REDUCERS OUTPUT1 OUTPUT_ID SAMPLE_SHEET INPUT_FORMAT OUTPUT_FORMAT OUTPUT_COMPRESSION"
   sys.exit(1)
 
 
 if __name__ == "__main__":
-  if len(sys.argv) != 9:
+  if len(sys.argv) != 12:
     usage_error()
 
   galaxy_data_index_dir = sys.argv[1]
@@ -42,6 +46,9 @@ if __name__ == "__main__":
   output1 = sys.argv[6]
   output_id = sys.argv[7]
   sample_sheet = sys.argv[8]
+  input_format = sys.argv[9]
+  output_format = sys.argv[10]
+  output_compression = sys.argv[11]
 
   mydir = os.path.abspath(os.path.dirname(__file__))
 
@@ -59,7 +66,12 @@ if __name__ == "__main__":
     'seal_demux', 
     '--sample-sheet', sample_sheet,
     '--num-reducers', num_reducers,
+    '--input-format', input_format,
+    '--output-format', output_format
     ))
+
+  if output_compression.lower() != 'none':
+    cmd.extend( ('--compress-output', output_compression) )
 
   if mismatches != '0':
     cmd.extend( ('--mismatches', mismatches) )

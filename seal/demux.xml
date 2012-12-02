@@ -11,6 +11,9 @@
     $output1
     $output1.id
     $sample_sheet
+    $input_format
+    $output_format
+    $output_compression
   </command>
 
   <inputs>
@@ -28,6 +31,19 @@
       value="90"
       min="1"
       />
+    <param name="input_format" type="select" label="Input data format" default="qseq">
+      <option value="qseq">Qseq</option>
+      <option value="fastq">Fastq</option>
+    </param>
+    <param name="output_format" type="select" label="Output data format" default="qseq">
+      <option value="qseq">Qseq</option>
+      <option value="fastq">Fastq</option>
+    </param>
+    <param name="output_compression" type="select" label="Output compression" default="none">
+      <option value="none">None</option>
+      <option value="gzip">Gzip</option>
+      <option value="bzip2">Bzip2</option>
+    </param>
   </inputs>
 
   <outputs>
