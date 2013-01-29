@@ -3,6 +3,7 @@
 <toolbox>
   <section name="Sequencing pipeline" id="seq">
     <tool file="seal/get_sample_sheet_from_run_dir.xml" />
+    <tool file="seal/check_for_index_read.xml" />
   </section>
   <section name="Seal" id="seal">
     <tool file="seal/make_pathset.xml" />

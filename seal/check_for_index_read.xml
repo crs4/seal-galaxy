@@ -1,0 +1,27 @@
+<tool id="check_for_index_read" name="Check for index read" version="0.1.0-devel">
+  <description>Read the Illumina run parameters to determine whether the run sequenced an index read.</description>
+  <command interpreter="python">
+    check_for_index_read.py
+    $run_dir
+    $output
+  </command>
+
+  <inputs>
+    <param name="run_dir" type="data" format="pathset" label="Run directory pathset" />
+  </inputs>
+
+  <outputs>
+    <data name="output" type="data" />
+  </outputs>
+
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>
+
+  <help>
+    Read the Illumina run parameters to determine whether the run sequenced an index read.
+    The run directory is provided as a pathset.  The output is a tab-separated file with
+    one line and two fields:  run dir, 'Indexed' or 'NotIndexed'.
+  </help>
+
+</tool>
