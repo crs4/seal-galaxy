@@ -14,11 +14,31 @@
     $input_format
     $output_format
     $output_compression
+    $index_present
   </command>
 
   <inputs>
     <param name="input_data" type="data" format="pathset" label="Source data set"/>
     <param name="sample_sheet" type="data" format="csv" label="Sample sheet" />
+
+    <conditional name="index">
+      <param name="specify_index" type="select" label="Index read" default="present">
+        <option value="present">Present</option>
+        <option value="not_present">Not present</option>
+        <option value="dynamic">Determine at runtime</option>
+      </param>
+
+      <when value="present">
+        #set $index_present = 'true'
+      </when>
+      <when value="not_present">
+        #set $index_present = 'false'
+      </when>
+      <when value="dynamic">
+        <param name="index_present" type="data" />
+      </when>
+    </conditional>
+
     <param name="mismatches"
       label="Barcode base mismatch limit"
       type="integer"
