@@ -7,7 +7,11 @@
     $input_data
     $mismatches
     $__new_file_path__
-    $num_reducers
+    #if $num_reducers
+      $num_reducers
+    #else
+      null
+    #end if
     $output1
     $output1.id
     $sample_sheet
@@ -50,6 +54,7 @@
       type="integer"
       value="90"
       min="1"
+      optional="true"
       />
     <param name="input_format" type="select" label="Input data format" default="qseq">
       <option value="qseq">Qseq</option>

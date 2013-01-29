@@ -20,6 +20,7 @@ by Demux.
 #    OUTPUT_COMPRESSION
 
 import os
+import re
 import subprocess
 import sys
 
@@ -86,13 +87,15 @@ if __name__ == "__main__":
   if os.path.exists(conf_file):
     cmd.extend( ('--conf', conf_file) )
 
+  cmd.append('seal_demux')
+
   cmd.extend( (
-    'seal_demux', 
     '--sample-sheet', sample_sheet,
-    '--num-reducers', num_reducers,
     '--input-format', input_format,
     '--output-format', output_format
     ))
+  if re.match(r'\s*\d+\s*', num_reducers):
+    cmd.extend( ('--num-reducers', num_reducers) )
 
   if output_compression.lower() != 'none':
     cmd.extend( ('--compress-output', output_compression) )
