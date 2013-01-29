@@ -41,7 +41,7 @@ class HadoopToolRunner(object):
 
   def __init__(self, tool_name):
     """
-    Initialize a SealToolRunner for a specific tool.
+    Initialize a HadoopToolRunner for a specific tool.
 
     tool_name will be used as the executable name.
     """
