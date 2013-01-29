@@ -38,7 +38,7 @@ if __name__ == '__main__':
   # we receive as input should only contains the output from one demux; thus
   # a sample should only occur once.
   if len(ipathset) != 1:
-    raise RuntimeError("Unexpected demx output pathset size of %d.  Expected 1 (the demux output path)" % len(ipathset))
+    raise RuntimeError("Unexpected demux output pathset size of %d.  Expected 1 (the demux output path)" % len(ipathset))
   sample_paths = \
     filter(lambda p: not os.path.basename(p).startswith("_"), # filter hadoop hidden files
       phdfs.ls(iter(ipathset).next()) # List the contents of the pathset. ls produces absolute paths
