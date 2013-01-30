@@ -242,6 +242,7 @@ class HadoopGalaxy(object):
     'seal_recab_table_fetch': HadoopToolRunner('seal_recab_table_fetch'),
     'seal_seqal':             SealSeqalRunner(),
     'seal_tsvsort':           HadoopToolRunner('seal_tsvsort'),
+    'seal_usort':             HadoopToolRunner('seal_usort'),
     'seal_version':           HadoopToolRunner('seal_version'),
     'dist_bcl2qseq.py':       HadoopToolRunner('dist_bcl2qseq.py'),
   }

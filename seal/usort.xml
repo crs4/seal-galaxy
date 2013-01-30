@@ -1,0 +1,45 @@
+<tool id="seal_usort" name="USort" version="0.4.0-devel">
+  <description>Sort reads by ID and separate them by read number.</description>
+
+  <command interpreter="python">
+    usort_galaxy.py
+      $GALAXY_DATA_INDEX_DIR
+      $input_data
+      $output1
+      $output2
+      $input_format
+      $output_format
+      $output_compression
+  </command>
+
+  <inputs>
+    <param name="input_data" type="data" format="pathset" label="Source data set"/>
+
+    <param name="input_format" type="select" label="Input data format" default="qseq">
+      <option value="qseq">Qseq</option>
+      <option value="fastq">Fastq</option>
+    </param>
+    <param name="output_format" type="select" label="Output data format" default="qseq">
+      <option value="qseq">Qseq</option>
+      <option value="fastq">Fastq</option>
+    </param>
+    <param name="output_compression" type="select" label="Output compression" default="none">
+      <option value="none">None</option>
+      <option value="gzip">Gzip</option>
+      <option value="bzip2">Bzip2</option>
+    </param>
+  </inputs>
+
+  <outputs>
+    <data name="output1" type="data" format="pathset" label="Read 1" />
+    <data name="output2" type="data" format="pathset" label="Read 2" />
+  </outputs>
+
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>
+
+  <help>
+    USort is a Hadoop utility to sort aggregated sequencing data into read 1 and read 2 datasets.
+  </help>
+</tool>

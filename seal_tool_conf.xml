@@ -12,5 +12,6 @@
     <tool file="seal/prq.xml" />
     <tool file="seal/seqal.xml" />
     <tool file="seal/recab_table.xml" />
+    <tool file="seal/usort.xml" />
   </section>
 </toolbox>
