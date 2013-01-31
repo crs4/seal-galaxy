@@ -16,4 +16,10 @@
   <stdio>
     <exit_code range="1:" level="fatal" />
   </stdio>
+
+  <help>
+		Datasets represented as pathsets can be split in a number of files.
+		This tool takes all of them and concatenates them into a single output file.
+	</help>
+
 </tool>
