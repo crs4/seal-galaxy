@@ -31,8 +31,8 @@
   </inputs>
 
   <outputs>
-    <data name="output1" type="data" format="pathset" label="Read 1" />
-    <data name="output2" type="data" format="pathset" label="Read 2" />
+    <data name="output1" type="data" format="pathset" label="$input_data.name Read 1" />
+    <data name="output2" type="data" format="pathset" label="$input_data.name Read 2" />
   </outputs>
 
   <stdio>
