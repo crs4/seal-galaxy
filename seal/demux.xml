@@ -18,7 +18,15 @@
     $input_format
     $output_format
     $output_compression
-    $index_present
+    #if $index.specify_index == 'present'
+      true
+    #else if $index.specify_index == 'not_present'
+      false
+    #else if $index.specify_index == 'dynamic'
+      $index_present
+    #else
+      #raise ValueError('Invalid index value!')
+    #end if
   </command>
 
   <inputs>
@@ -31,13 +39,6 @@
         <option value="not_present">Not present</option>
         <option value="dynamic">Determine at runtime</option>
       </param>
-
-      <when value="present">
-        #set $index_present = 'true'
-      </when>
-      <when value="not_present">
-        #set $index_present = 'false'
-      </when>
       <when value="dynamic">
         <param name="index_present" type="data" />
       </when>
