@@ -18,6 +18,7 @@ by Demux.
 #    INPUT_FORMAT
 #    OUTPUT_FORMAT
 #    OUTPUT_COMPRESSION
+#    SEPARATE_READS
 
 import os
 import re
@@ -54,12 +55,12 @@ def usage_error(msg=None):
   if msg:
     print >> sys.stderr, msg
   print >> sys.stderr, "Usage:", os.path.basename(sys.argv[0]),\
-    "GALAXY_DATA_INDEX_DIR INPUT_DATA MISMATCHES NEW_FILE_PATH NUM_REDUCERS OUTPUT1 OUTPUT_ID SAMPLE_SHEET INPUT_FORMAT OUTPUT_FORMAT OUTPUT_COMPRESSION INDEX_PRESENT"
+    "GALAXY_DATA_INDEX_DIR INPUT_DATA MISMATCHES NEW_FILE_PATH NUM_REDUCERS OUTPUT1 OUTPUT_ID SAMPLE_SHEET INPUT_FORMAT OUTPUT_FORMAT OUTPUT_COMPRESSION INDEX_PRESENT SEPARATE_READS"
   sys.exit(1)
 
 
 if __name__ == "__main__":
-  if len(sys.argv) != 13:
+  if len(sys.argv) != 14:
     usage_error()
 
   galaxy_data_index_dir = sys.argv[1]
@@ -74,6 +75,7 @@ if __name__ == "__main__":
   output_format      = sys.argv[10]
   output_compression = sys.argv[11]
   index_present      = sys.argv[12]
+  separate_reads     = sys.argv[13]
 
   mydir = os.path.abspath(os.path.dirname(__file__))
 
@@ -106,6 +108,14 @@ if __name__ == "__main__":
   is_indexed = parse_index_present(index_present)
   if is_indexed is False:
     cmd.append("--no-index")
+
+  norm_separate_reads = separate_reads.lower().strip()
+  if norm_separate_reads == 'separate-reads':
+    cmd.append("--separate-reads")
+  elif norm_separate_reads.startswith('f'):
+    pass
+  else:
+    raise RuntimeError("Unrecognized value for separate-reads parameter:  '%s'" % separate_reads)
 
   print >> sys.stderr, ' '.join(cmd)
   subprocess.check_call(cmd)

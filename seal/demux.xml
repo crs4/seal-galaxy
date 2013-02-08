@@ -27,6 +27,7 @@
     #else
       #raise ValueError('Invalid index value!')
     #end if
+    $separate_reads
   </command>
 
   <inputs>
@@ -70,6 +71,12 @@
       <option value="gzip">Gzip</option>
       <option value="bzip2">Bzip2</option>
     </param>
+
+    <param name="separate_reads" type="boolean"
+      label="Separate reads by read number"
+      default="false"
+      truevalue="separate-reads"
+      />
   </inputs>
 
   <outputs>
