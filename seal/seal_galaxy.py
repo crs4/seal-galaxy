@@ -251,6 +251,7 @@ class HadoopGalaxy(object):
     self.parser = argparse.ArgumentParser(description="Wrap Hadoop-based Seal tools to run within Galaxy")
     self.parser.add_argument('tool', metavar="SealExecutable", help="Seal program to run")
     self.parser.add_argument('--input', metavar="InputPath", help="Input paths provided by Galaxy.")
+    self.parser.add_argument('--input-format', metavar="InputFormat", help="Input format provided by Galaxy.")
     self.parser.add_argument('--output', metavar="OutputPath", help="Output path provided by Galaxy")
     self.parser.add_argument('--append-python-path', metavar="PATH",
         help="Path to append to the PYTHONPATH before calling the Seal executable")
