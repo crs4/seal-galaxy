@@ -87,7 +87,7 @@ if __name__ == '__main__':
     u = urlparse(first_src_uri)
     if len(pset) == 1 and u.scheme == 'file' and os.path.isfile(u.path):
       logging.debug("Pathset contains single local file")
-      copy_file(src_uri, output_file)
+      copy_file(first_src_uri, output_file)
     else: # more than one path
       for idx, p in enumerate(pset):
         if phdfs.path.isdir(p):
