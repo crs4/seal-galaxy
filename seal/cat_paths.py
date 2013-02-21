@@ -2,12 +2,10 @@
 
 import logging
 import os
-import shutil
 import subprocess
 import sys
 from urlparse import urlparse
 
-from automator import illumina_run_dir as ill
 import pathset
 import pydoop
 import pydoop.hdfs as phdfs
