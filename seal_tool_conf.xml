@@ -15,5 +15,6 @@
     <tool file="seal/recab_table.xml" />
     <tool file="seal/usort.xml" />
     <tool file="seal/dist_text_zipper.xml" />
+    <tool file="seal/generate_sam_header.xml" />
   </section>
 </toolbox>
