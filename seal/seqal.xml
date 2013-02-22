@@ -23,10 +23,8 @@
   <inputs>
     <param name="input_data" type="data" format="pathset" label="Input data" />
 
-    <param name="reference" type="select" label="Reference">
-      <options from_file="references.loc">
-        <column name="name" index="1"/> <!-- display name -->
-        <column name="value" index="2"/> <!-- URI -->
+    <param name="reference" type="select" label="Select a built-in reference index archive">
+      <options from_data_table="seqal_indexes.loc">
       </options>
     </param>
 
