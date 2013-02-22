@@ -8,9 +8,9 @@
       --conf ${GALAXY_DATA_INDEX_DIR}/seal_galaxy_conf.yaml
     #end if
     --input $input_data
-    --input-format $input_format.type
     --output $output1
     seal_prq
+    --input-format $input_format.type
     --num-reducers $num_reducers
 		-D hbam.qseq-input.base-quality-encoding=$input_format.bq_encoding
 		-D hbam.fastq-input.base-quality-encoding=$input_format.bq_encoding
