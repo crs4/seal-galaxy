@@ -17,14 +17,14 @@
       --num-reducers $align_only.num_reducers
     #end if
     --trimq $trimq
-    $reference
+    ${reference.fields.path}
   </command>
 
   <inputs>
     <param name="input_data" type="data" format="pathset" label="Input data" />
 
     <param name="reference" type="select" label="Select a built-in reference index archive">
-      <options from_data_table="seqal_indexes.loc">
+      <options from_data_table="seqal_indexes">
       </options>
     </param>
 
