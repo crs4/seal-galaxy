@@ -1,6 +1,6 @@
 <tool id="seal_prq" name="Prq" version="0.4.0-devel">
-	<description>Convert qseq or fastq files to prq on Hadoop</description>
-	<command interpreter="python">
+  <description>Convert qseq or fastq files to prq on Hadoop</description>
+  <command interpreter="python">
     seal_galaxy.py
     #import os
     #set $exists = os.path.exists(os.path.join($GALAXY_DATA_INDEX_DIR, "seal_galaxy_conf.yaml"))
@@ -12,43 +12,43 @@
     seal_prq
     --input-format $input_format.type
     --num-reducers $num_reducers
-		-D hbam.qseq-input.base-quality-encoding=$input_format.bq_encoding
-		-D hbam.fastq-input.base-quality-encoding=$input_format.bq_encoding
+    -D hbam.qseq-input.base-quality-encoding=$input_format.bq_encoding
+    -D hbam.fastq-input.base-quality-encoding=$input_format.bq_encoding
 
-		#if $bpr
-		  -D seal.prq.min-bases-per-read=$bpr
-		#end if
-		#if $drop_failed
-			-D seal.prq.drop-failed-filter=$drop_failed
-		#end if
-		#if $warn_unpaired
-			-D seal.prq.warning-only-if-unpaired=$warn_unpaired
-		#end if
-	</command>
+    #if $bpr
+      -D seal.prq.min-bases-per-read=$bpr
+    #end if
+    #if $drop_failed
+      -D seal.prq.drop-failed-filter=$drop_failed
+    #end if
+    #if $warn_unpaired
+      -D seal.prq.warning-only-if-unpaired=$warn_unpaired
+    #end if
+  </command>
 
   <inputs>
     <param name="input_data" type="data" format="pathset" label="Input data" />
-		<conditional name="input_format">
-			<!-- We use a conditional for the input_format since we want a different
-					 default base quality encoding value for each of the respective
-					 supported formats, qseq and fastq.-->
-			<param name="type" type="select" label="Input format" default="qseq">
-				<option value="qseq" />
-				<option value="fastq" />
-			</param>
-			<when value="qseq">
-				<param name="bq_encoding" type="select" label="BQ encoding" default="illumina">
-					<option value="illumina">Illumina</option>
-					<option value="sanger">Sanger</option>
-				</param>
-			</when>
-			<when value="fastq">
-				<param name="bq_encoding" type="select" label="BQ encoding" default="sanger">
-					<option value="sanger">Sanger</option>
-					<option value="illumina">Illumina</option>
-				</param>
-			</when>
-		</conditional>
+    <conditional name="input_format">
+      <!-- We use a conditional for the input_format since we want a different
+           default base quality encoding value for each of the respective
+           supported formats, qseq and fastq.-->
+      <param name="type" type="select" label="Input format" default="qseq">
+        <option value="qseq" />
+        <option value="fastq" />
+      </param>
+      <when value="qseq">
+        <param name="bq_encoding" type="select" label="BQ encoding" default="illumina">
+          <option value="illumina">Illumina</option>
+          <option value="sanger">Sanger</option>
+        </param>
+      </when>
+      <when value="fastq">
+        <param name="bq_encoding" type="select" label="BQ encoding" default="sanger">
+          <option value="sanger">Sanger</option>
+          <option value="illumina">Illumina</option>
+        </param>
+      </when>
+    </conditional>
 
     <param name="num_reducers"
       label="Number of reduce tasks"
@@ -57,26 +57,26 @@
       min="1"
       />
 
-		<!-- prq-specific parameters -->
-		<param name="bpr"
-			label="Min bases per read"
-			type="integer"
-			help="If neither read in a pair has at least this many known bases the pair is dropped (prop: seal.prq.min-bases-per-read)."
-			value="30"
-			min="0"
-			/>
-		<param name="drop_failed"
-			label="Filter by machine quality check"
-			type="boolean"
-			help="Drop pairs if both reads failed machine quality checks (prop: seal.prq.drop-failed-filter)."
-			checked="true"
-			/>
-		<param name="warn_unpaired"
-			label="Warn only on unpaired reads"
-			type="boolean"
-			help="PRQ normally gives an error if it finds an unpaired read. If this setting is checked it will instead emit a warning, drop the unpaired read and keep going (prop: seal.prq.warning-only-if-unpaired)."
-			checked="false"
-			/>
+    <!-- prq-specific parameters -->
+    <param name="bpr"
+      label="Min bases per read"
+      type="integer"
+      help="If neither read in a pair has at least this many known bases the pair is dropped (prop: seal.prq.min-bases-per-read)."
+      value="30"
+      min="0"
+      />
+    <param name="drop_failed"
+      label="Filter by machine quality check"
+      type="boolean"
+      help="Drop pairs if both reads failed machine quality checks (prop: seal.prq.drop-failed-filter)."
+      checked="true"
+      />
+    <param name="warn_unpaired"
+      label="Warn only on unpaired reads"
+      type="boolean"
+      help="PRQ normally gives an error if it finds an unpaired read. If this setting is checked it will instead emit a warning, drop the unpaired read and keep going (prop: seal.prq.warning-only-if-unpaired)."
+      checked="false"
+      />
   </inputs>
 
   <outputs>
