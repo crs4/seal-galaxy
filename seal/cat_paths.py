@@ -66,10 +66,10 @@ def append_dir(d, output):
       items += 1
   return items
 
-if __name__ == '__main__':
-  if len(sys.argv) != 3:
+def main(args):
+  if len(args) != 2:
     usage_error()
-  input_pathset, output_file = sys.argv[1:]
+  input_pathset, output_file = args
 
   output_file = os.path.abspath(output_file)
 
@@ -99,3 +99,6 @@ if __name__ == '__main__':
     print >> sys.stderr, "IOError copying pathset to", output_file
     print >> sys.stderr, "Exception:", str(e)
     sys.exit(1)
+
+if __name__ == '__main__':
+  main(sys.argv[1:])
