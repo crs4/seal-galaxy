@@ -14,5 +14,6 @@
     <tool file="seal/seqal.xml" />
     <tool file="seal/recab_table.xml" />
     <tool file="seal/usort.xml" />
+    <tool file="seal/dist_text_zipper.xml" />
   </section>
 </toolbox>
