@@ -232,19 +232,8 @@ class SealSeqalRunner(SealToolRunner):
 
 class HadoopGalaxy(object):
   Runners = {
-    'seal_bwa_index_to_mmap': HadoopToolRunner('seal_bwa_index_to_mmap'),
     'seal_demux':             SealDemuxRunner(),
-    'seal_distcp_files':      HadoopToolRunner('seal_distcp_files'),
-    'seal_merge_alignments':  HadoopToolRunner('seal_merge_alignments'),
-    'seal_prq':               HadoopToolRunner('seal_prq'),
-    'seal_read_sort':         HadoopToolRunner('seal_read_sort'),
-    'seal_recab_table':       HadoopToolRunner('seal_recab_table'),
-    'seal_recab_table_fetch': HadoopToolRunner('seal_recab_table_fetch'),
-    'seal_seqal':             SealSeqalRunner(),
-    'seal_tsvsort':           HadoopToolRunner('seal_tsvsort'),
-    'seal_usort':             HadoopToolRunner('seal_usort'),
-    'seal_version':           HadoopToolRunner('seal_version'),
-    'dist_bcl2qseq.py':       HadoopToolRunner('dist_bcl2qseq.py'),
+    'seal_seqal':             SealSeqalRunner()
   }
 
   def __init__(self):
@@ -264,7 +253,7 @@ class HadoopGalaxy(object):
   def get_runner(self, tool_name, input_pathset, output_pathset, args):
     r = self.Runners.get(tool_name)
     if r is None:
-      raise IndexError("Unknown seal tool %s" % tool_name)
+      r = HadoopToolRunner(tool_name)
     r.set_conf(self.conf)
     r.set_input(input_pathset)
     r.set_output(output_pathset)

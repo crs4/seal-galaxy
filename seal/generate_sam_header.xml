@@ -1,0 +1,74 @@
+<tool id="generate_sam_header" name="Generate SAM header" version="0.1.0">
+  <description>Generate a SAM header for the given reference</description>
+
+  <command interpreter="python">
+		#set $ref_path = 'file://' + $reference.fields.path if $reference.fields.path.startswith('/') else $reference.fields.path
+    generate_sam_header.py
+    --header-only
+    --annotations ${ref_path}.ann
+    --sort-order $sort_order
+
+    #if $compute_md5:
+    --md5
+    #end if
+
+    #if $assembly:
+    --sq-assembly "$assembly"
+    #end if
+
+    #if $rg.set_rg == 'true':
+      --rg_cn "$rg.rg_cn"
+      --rg_dt "$rg.rg_dt"
+      --rg_id "$rg.rg_id"
+      --rg_lb "$rg.rg_lb"
+      --rg_pl "$rg.rg_pl"
+      --rg_pu "$rg.rg_pu"
+      --rg_sm "$rg.rg_sm"
+    #end if
+
+    ${output}
+  </command>
+
+  <inputs>
+    <param name="reference" type="select" label="Reference (should be the same one used for alignment)">
+      <options from_data_table="bwa_0510_indexes" />
+    </param>
+
+    <param name="sort_order" type="select" default="coordinate">
+      <option value="coordinate">Coordinate</option>
+      <option value="read_id">Read ID</option>
+      <option value="unsorted">Unsorted</option>
+    </param>
+
+    <param name="compute_md5" type="boolean" checked="false" label="Whether to compute the MD5 checksums of the reference contigs" />
+    <param name="assembly" type="text" label="Genome assembly identifier (@SQ AS:XXX tag)" />
+
+    <conditional name="rg">
+      <param name="set_rg" type="boolean" checked="false" label="Set a Read Group line" truevalue="true" falsevalue="false" />
+
+      <when value="true">
+        <param name="rg_cn" type="text" label="Read group center" />
+        <param name="rg_dt" type="text" label="Read group date" />
+        <param name="rg_id" type="text" label="Read group id" />
+        <param name="rg_lb" type="text" label="Read group library" />
+        <param name="rg_pl" type="text" label="Read group platform" />
+        <param name="rg_pu" type="text" label="Read group platform unit" />
+        <param name="rg_sm" type="text" label="Read group sample" />
+      </when>
+    </conditional>
+  </inputs>
+
+  <outputs>
+    <data name="output" format="sam" />
+  </outputs>
+
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>
+
+  <help>
+		ReadSort is a Hadoop-based program for sorting reads by alignment position.
+	 	For the full help see the `manual &lt;http://biodoop-seal.sourceforge.net/read_sort_index.html&gt;`_.
+  </help>
+
+</tool>

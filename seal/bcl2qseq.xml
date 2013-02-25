@@ -1,4 +1,4 @@
-<tool id="bcbb_bcl2qseq" name="Dist Bcl2Qseq" version="0.1.0">
+<tool id="dist_bcl2qseq" name="Dist Bcl2Qseq" version="0.1.0">
   <description>Convert Illumina bcl files to qseq on Hadoop</description>
 
   <command interpreter="python">

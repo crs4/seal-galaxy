@@ -2,12 +2,10 @@
 
 import logging
 import os
-import shutil
 import subprocess
 import sys
 from urlparse import urlparse
 
-from automator import illumina_run_dir as ill
 import pathset
 import pydoop
 import pydoop.hdfs as phdfs
@@ -68,10 +66,10 @@ def append_dir(d, output):
       items += 1
   return items
 
-if __name__ == '__main__':
-  if len(sys.argv) != 3:
+def main(args):
+  if len(args) != 2:
     usage_error()
-  input_pathset, output_file = sys.argv[1:]
+  input_pathset, output_file = args
 
   output_file = os.path.abspath(output_file)
 
@@ -87,7 +85,7 @@ if __name__ == '__main__':
     u = urlparse(first_src_uri)
     if len(pset) == 1 and u.scheme == 'file' and os.path.isfile(u.path):
       logging.debug("Pathset contains single local file")
-      copy_file(src_uri, output_file)
+      copy_file(first_src_uri, output_file)
     else: # more than one path
       for idx, p in enumerate(pset):
         if phdfs.path.isdir(p):
@@ -101,3 +99,6 @@ if __name__ == '__main__':
     print >> sys.stderr, "IOError copying pathset to", output_file
     print >> sys.stderr, "Exception:", str(e)
     sys.exit(1)
+
+if __name__ == '__main__':
+  main(sys.argv[1:])
