@@ -6,7 +6,13 @@
     $GALAXY_DATA_INDEX_DIR
     $input_data
     $output1
-    $vcf
+   
+    #if $dbsnp.db_source == "history":
+        $dbsnp.ownFile
+    #else:
+        ${dbsnp.built-inFile.fields.path} 
+    #end if
+
     $num_reducers
 
     #if $default_rg:
@@ -29,12 +35,23 @@
       <option value="bam" />
     </param>
 
-    <param name="vcf" type="select" label="VCF file" >
-      <options from_file="variant_tables.loc">
-        <column name="name" index="1"/> <!-- display name -->
-        <column name="value" index="2"/> <!-- URI -->
-      </options>
-    </param>
+    <conditional name="dbsnp"> 
+      <param name="db_source" type="select" label="Select database of known variation sites">        
+        <option value="built-in">Select a different built-in database</option>
+        <option value="history">Use a database (vcf format) from my history</option>
+      </param>       
+
+        <when value="built-in">
+        <param name="built-inFile" type="select" label="Select a built-in database">
+          <options from_data_table="variant_tables"/>
+        </param>
+      </when>
+
+      <when value="history">
+        <param name="ownFile" type="data" format="vcf" label="Select a database from history"/>
+      </when>
+    </conditional>
+
 
     <param name="num_reducers"
       label="Number of reduce tasks"
