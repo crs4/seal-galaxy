@@ -52,6 +52,8 @@ class HadoopToolRunner(object):
     self.output_str = None
     # a list of options
     self.generic_opts = []
+    # configuration dict
+    self.conf = None
 
   def __str__(self):
     return ' '.join(
@@ -117,7 +119,7 @@ class HadoopToolRunner(object):
 
     # now verify that we find the executable in the PATh
     try:
-      full_path =\
+      full_path = \
         next(os.path.join(p, self.tool)
              for p in os.environ.get('PATH', '').split(os.pathsep)
              if os.access(os.path.join(p, self.tool), os.X_OK))
@@ -144,7 +146,7 @@ class HadoopToolRunner(object):
     tool_env = self.conf.get('tool_env')
     if tool_env is not None:
       env = copy.copy(os.environ.data)
-      for k,v in tool_env.iteritems():
+      for k, v in tool_env.iteritems():
         env[k] = v
     else:
       env = os.environ
@@ -231,6 +233,8 @@ class SealSeqalRunner(SealToolRunner):
 
 
 class HadoopGalaxy(object):
+  HadoopOutputDirName = 'hadoop_output'
+
   Runners = {
     'seal_demux':             SealDemuxRunner(),
     'seal_seqal':             SealSeqalRunner()
@@ -273,6 +277,19 @@ class HadoopGalaxy(object):
       os.environ['HADOOP_CONF_DIR'] = self.conf['HADOOP_CONF_DIR']
 
   def gen_output_path(self, options, name=None):
+    """
+    Generate an output path for the data produced by the hadoop job.
+
+    The default behaviour is to use the path provided for the output pathset
+    (options.output) as a base.  The data path is created as
+      os.path.dirname(options.output)/hadoop_output/os.path.basename(options.output)
+
+    The path to the hadoop_output directory to use can be overridden with
+    options.output_dir option.
+
+    The name of the last component of the path (os.path.basename(...)) can be
+    explicitly set by passing a value for the `name` function argument.
+    """
     if name:
       suffix_path = name
     else:
@@ -284,7 +301,7 @@ class HadoopGalaxy(object):
     if os.path.abspath(options.output_dir) == os.path.abspath(os.path.dirname(options.output)):
       # If pathset output and data are being written to the same directory,
       # put the data in a 'hadoop_output' subdirectory.
-      datapath = os.path.join(options.output_dir, 'hadoop_output')
+      datapath = os.path.join(options.output_dir, self.HadoopOutputDirName)
       self.log.debug("Data output directory same as pathset output directory.")
     else:
       datapath = options.output_dir
