@@ -232,12 +232,37 @@ class SealSeqalRunner(SealToolRunner):
     return cmd
 
 
+class SealRecabRunner(SealToolRunner):
+  """
+  Specialized class to run the seal_recab_table command.
+
+  """
+  def __init__(self):
+    super(type(self), self).__init__('seal_recab_table')
+
+  def parse_args(self, args_list):
+    super(type(self), self).parse_args(args_list)
+    try:
+      vcf_idx = self.generic_opts.index("--vcf-file")
+      # the following argument should be the path to the sample sheet
+      if vcf_idx + 1 >= len(self.generic_opts):
+        raise RuntimeError("Missing argument to --vcf")
+      # sanitize this path, assuming it's a local path
+      vcf_idx += 1
+      self.generic_opts[vcf_idx] = Pathset.sanitize_path(self.generic_opts[vcf_idx])
+    except ValueError: # raised if we don't find a --sample-sheet argument
+      # in this case, we'll let the program go through and let Demux print
+      # the appropriate error to the user
+      pass
+
+
 class HadoopGalaxy(object):
   HadoopOutputDirName = 'hadoop_output'
 
   Runners = {
     'seal_demux':             SealDemuxRunner(),
-    'seal_seqal':             SealSeqalRunner()
+    'seal_seqal':             SealSeqalRunner(),
+    'seal_recab_table':       SealRecabRunner()
   }
 
   def __init__(self):

@@ -17,9 +17,11 @@ concatenate all the partial tables and create a single csv file.
 import os
 import sys
 
+from seal_galaxy import HadoopGalaxy
 import pathset
 import subprocess
 import tempfile
+import pydoop.hdfs as phdfs
 
 # XXX: add --append-python-path to the possible arguments?
 
@@ -29,47 +31,79 @@ def usage_error(msg=None):
   print >> sys.stderr, os.path.basename(sys.argv[0]), "GALAXY_DATA_INDEX_DIR INPUT_DATA OUTPUT VCF NUM_REDUCERS [OTHER]"
   sys.exit(1)
 
-if __name__ == "__main__":
-  if len(sys.argv) < 6:
-    usage_error()
 
-  galaxy_data_index_dir = sys.argv[1]
-  input_data = sys.argv[2]
-  final_output = sys.argv[3]
-  vcf = sys.argv[4]
-  num_reducers = sys.argv[5]
-  other = sys.argv[6:]
-
+def run_recab(conf_file, input_path, output_path, vcf, num_red, other_args):
   mydir = os.path.abspath(os.path.dirname(__file__))
-  with tempfile.NamedTemporaryFile(mode='rwb') as pathset_file:
-    cmd = [
-      os.path.join(mydir, 'seal_galaxy.py'),
-      '--input', input_data,
-      '--output', pathset_file.name
-      ]
-    conf_file = os.path.join(galaxy_data_index_dir, 'seal_galaxy_conf.yaml')
-    if os.path.exists(conf_file):
-      cmd.extend( ('--conf', conf_file) )
-    cmd.extend( (
+  cmd = [
+    os.path.join(mydir, 'seal_galaxy.py'),
+    '--input', input_path,
+    '--output', output_path,
+    # XXX: assumes the output directory is on a locally mounted file system
+    '--output-dir', os.path.join('file://', os.path.dirname(input_path), HadoopGalaxy.HadoopOutputDirName)
+    ]
+
+  if os.path.exists(conf_file):
+    cmd.extend( ('--conf', conf_file) )
+
+  cmd.extend( (
     'seal_recab_table',
     '--vcf-file', vcf,
-    '--num-reducers', num_reducers
-    ))
-    cmd.extend(other)
+    '--num-reducers', num_red
+  ))
 
-    # now execute the hadoop job
-    subprocess.check_call(cmd)
-    # finally, fetch the result into the final output file
-    p = pathset.FilePathset.from_file(pathset_file)
-    cmd = ['seal_recab_table_fetch']
-    cmd.extend(p.get_paths())
-    cmd.append(final_output)
+  if other_args:
+    cmd.extend(other_args)
+
+  # now execute the hadoop job
+  subprocess.check_call(cmd)
+
+def collect_table(pset, output_path):
+  # finally, fetch the result into the final output file
+  cmd = ['seal_recab_table_fetch']
+  cmd.extend(pset.get_paths())
+  cmd.append(output_path)
+  try:
+    # remove the file that galaxy creates.  recab_table_fetch refuses to
+    # overwrite it
+    os.unlink(output_path)
+  except IOError:
+    pass
+  subprocess.check_call(cmd)
+
+def cleanup(out_pathset):
+  # clean-up job output
+  for path in out_pathset:
     try:
-      # remove the file that galaxy creates.  recab_table_fetch refuses to
-      # overwrite it
-      os.unlink(final_output)
-    except:
-      pass
-    subprocess.check_call(cmd)
+      print >> sys.stderr, "Deleting output path", path
+      phdfs.rmr(path)
+    except StandardError as e:
+      print >> sys.stderr, "Error!", str(e)
+
+def main(args):
+  if len(args) < 5:
+    usage_error()
+
+  galaxy_data_index_dir = args[0]
+  input_data            = args[1]
+  final_output          = args[2]
+  vcf                   = args[3]
+  num_reducers          = args[4]
+  other                 = args[5:]
+
+  conf_file = os.path.join(galaxy_data_index_dir, 'seal_galaxy_conf.yaml')
+
+  # Create a temporary pathset to reference the recab_table
+  # output directory
+  with tempfile.NamedTemporaryFile(mode='rwb') as tmp_pathset_file:
+    try:
+      run_recab(conf_file, input_data, tmp_pathset_file.name, vcf, num_reducers, other)
+      tmp_pathset_file.seek(0)
+      out_paths = pathset.FilePathset.from_file(tmp_pathset_file)
+      collect_table(out_paths, final_output)
+    finally:
+      cleanup(out_paths)
+
+if __name__ == "__main__":
+  main(sys.argv[1:])
 
 # vim: et ai ts=2 sw=2
