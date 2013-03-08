@@ -10,7 +10,7 @@
   </inputs>
 
   <outputs>
-    <data name="output_path" type="data" label="Concated dataset $input_pathset.name" />
+    <data name="output_path" type="data" label="Concatenated dataset $input_pathset.name" />
   </outputs>
 
   <stdio>
