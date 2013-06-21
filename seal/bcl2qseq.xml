@@ -10,29 +10,63 @@
     #end if
     --input $input_data
     --output $output1
-    dist_bcl2qseq.py
-    #if $modules:
-      -m "$modules"
-    #end if
-    #if $advanced.control == 'show' and $advanced.bcl2qseq_bin:
-    --bclToQseq-path $advanced.bcl2qseq_bin
+    seal_dist_bcl2qseq
+    #if $advanced.control == 'show'
+      #if $advanced.bcl2qseq_bin:
+      --bclToQseq-path $advanced.bcl2qseq_bin
+      #end if
+
+      #if $advanced.additional_ld_path
+      --append-ld-library-path $advanced.additional_ld_path
+      #end if
+      #if $advanced.ignore_missing_bcl
+      --ignore-missing-bcl
+      #end if
+      #if $advanced.ignore_missing_control
+      --ignore-missing-control
+      #end if
+      #if $advanced.exclude_controls
+      --exclude-controls
+      #end if
+      #if $advanced.no_eamss
+      --no-eamss
+      #end if
     #end if
   </command>
 
   <inputs>
     <param name="input_data" type="data" format="pathset" label="Source data set"/>
-    <param name="modules" type="text" label="modules to load before running bclToQseq (optional)" />
     <conditional name="advanced">
       <param name="control" type="select" label="Advanced controls" default="hide">
         <option value="hide">Hide</option>
         <option value="show">Show</option>
       </param>
       <when value="show">
+        <param name="ignore_missing_bcl"
+          type="boolean" default="false"
+          label="Interpret missing *.bcl files as a base calling of '.'"
+          />
+        <param name="ignore_missing_control"
+          type="boolean" default="false"
+          label="Don't throw an error when *.control files are missing"
+          />
+        <param name="exclude_controls"
+          type="boolean" default="false"
+          label="Do not include clusters that are used as controls"
+          />
+        <param name="no_eamss"
+          type="boolean" default="false"
+          label="Do not apply the EAMSS masking on the quality values"
+          />
         <param name="bcl2qseq_bin"
           type="text"
           default=""
           size="80"
           label="Full path to bclToQseq binary (needed only if the executable isn't in the PATH)"
+          />
+        <param name="additional_ld_path"
+          type="text" default="" size="80"
+          label="paths to append to the value of LD_LIBRARY_PATH"
           />
       </when>
     </conditional>
