@@ -195,10 +195,10 @@ class SealDemuxRunner(SealToolRunner):
   it's path is passed to Hadoop and thus needs to be a complete URI.
   """
   def __init__(self):
-    super(type(self), self).__init__('seal_demux')
+    super(SealDemuxRunner, self).__init__('seal_demux')
 
   def parse_args(self, args_list):
-    super(type(self), self).parse_args(args_list)
+    super(SealDemuxRunner, self).parse_args(args_list)
     try:
       sample_sheet_idx = self.generic_opts.index("--sample-sheet")
       # the following argument should be the path to the sample sheet
@@ -215,7 +215,8 @@ class SealDemuxRunner(SealToolRunner):
 
 class SealSeqalRunner(SealToolRunner):
   def __init__(self):
-    super(type(self), self).__init__('seal_seqal')
+    super(SealSeqalRunner, self).__init__('seal_seqal')
+    self.reference_path = None
 
   def parse_args(self, args_list):
     # need to sanitize the reference argument.  Should be the last one
@@ -227,7 +228,7 @@ class SealSeqalRunner(SealToolRunner):
     Overrides the default 'command' method by appending the reference path to
     the end of the returned command array.
     """
-    cmd = super(type(self), self).command()
+    cmd = super(SealSeqalRunner, self).command()
     cmd.append(self.reference_path)
     return cmd
 
@@ -238,10 +239,10 @@ class SealRecabRunner(SealToolRunner):
 
   """
   def __init__(self):
-    super(type(self), self).__init__('seal_recab_table')
+    super(SealRecabRunner, self).__init__('seal_recab_table')
 
   def parse_args(self, args_list):
-    super(type(self), self).parse_args(args_list)
+    super(SealRecabRunner, self).parse_args(args_list)
     try:
       vcf_idx = self.generic_opts.index("--vcf-file")
       # the following argument should be the path to the sample sheet
@@ -278,6 +279,8 @@ class HadoopGalaxy(object):
     self.parser.add_argument('--conf', metavar="SealConf", help="Seal+Galaxy configuration file")
     self.parser.add_argument('remaining_args', nargs=argparse.REMAINDER)
     logging.basicConfig(level=logging.DEBUG)
+    self.log = None
+    self.conf = None
 
   def get_runner(self, tool_name, input_pathset, output_pathset, args):
     r = self.Runners.get(tool_name)
