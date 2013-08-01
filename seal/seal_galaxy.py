@@ -377,6 +377,7 @@ class HadoopGalaxy(object):
       self.log.exception(e)
       sys.exit(2)
     except subprocess.CalledProcessError, e:
+      self.log.exception(e)
       if e.returncode < 0:
         self.log.critical("%s was terminated by signal %d", options.tool, e.returncode)
       elif e.returncode > 0:
