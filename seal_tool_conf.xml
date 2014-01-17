@@ -2,7 +2,6 @@
 
 <toolbox>
   <section name="Sequencing pipeline" id="seq">
-    <tool file="seal/get_sample_sheet_from_run_dir.xml" />
     <tool file="seal/check_for_index_read.xml" />
     <tool file="seal/cat_paths.xml" />
     <tool file="seal/split_pathset.xml" />
