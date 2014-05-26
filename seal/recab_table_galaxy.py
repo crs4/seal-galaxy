@@ -26,7 +26,6 @@ concatenate all the partial tables and create a single csv file.
 
 
 # parameters:
-#    GALAXY_DATA_INDEX_DIR
 #    INPUT_DATA
 #    OUTPUT
 #    VCF
@@ -36,8 +35,7 @@ concatenate all the partial tables and create a single csv file.
 import os
 import sys
 
-from seal_galaxy import HadoopGalaxy
-import pathset
+import hadoop_galaxy.pathset as pathset
 import subprocess
 import tempfile
 import pydoop.hdfs as phdfs
@@ -47,28 +45,21 @@ import pydoop.hdfs as phdfs
 def usage_error(msg=None):
   if msg:
     print >> sys.stderr, msg
-  print >> sys.stderr, os.path.basename(sys.argv[0]), "GALAXY_DATA_INDEX_DIR INPUT_DATA OUTPUT VCF NUM_REDUCERS [OTHER]"
+  print >> sys.stderr, os.path.basename(sys.argv[0]), "INPUT_DATA OUTPUT VCF NUM_REDUCERS [OTHER]"
   sys.exit(1)
 
 
-def run_recab(conf_file, input_path, output_path, vcf, num_red, other_args):
+def run_recab(input_path, output_path, vcf, num_red, other_args):
   mydir = os.path.abspath(os.path.dirname(__file__))
   cmd = [
-    os.path.join(mydir, 'seal_galaxy.py'),
+    'hadoop_galaxy',
     '--input', input_path,
     '--output', output_path,
-    # XXX: assumes the output directory is on a locally mounted file system
-    '--output-dir', os.path.join('file://', os.path.dirname(input_path), HadoopGalaxy.HadoopOutputDirName)
-    ]
-
-  if os.path.exists(conf_file):
-    cmd.extend( ('--conf', conf_file) )
-
-  cmd.extend( (
-    'seal_recab_table',
+    '--executable', 'seal',
+    'recab_table',
     '--vcf-file', vcf,
     '--num-reducers', num_red
-  ))
+  ]
 
   if other_args:
     cmd.extend(other_args)
@@ -78,7 +69,7 @@ def run_recab(conf_file, input_path, output_path, vcf, num_red, other_args):
 
 def collect_table(pset, output_path):
   # finally, fetch the result into the final output file
-  cmd = ['seal_recab_table_fetch']
+  cmd = ['seal', 'recab_table_fetch']
   cmd.extend(pset.get_paths())
   cmd.append(output_path)
   try:
@@ -102,20 +93,17 @@ def main(args):
   if len(args) < 5:
     usage_error()
 
-  galaxy_data_index_dir = args[0]
-  input_data            = args[1]
-  final_output          = args[2]
-  vcf                   = args[3]
-  num_reducers          = args[4]
-  other                 = args[5:]
-
-  conf_file = os.path.join(galaxy_data_index_dir, 'seal_galaxy_conf.yaml')
+  input_data            = args[0]
+  final_output          = args[1]
+  vcf                   = args[2]
+  num_reducers          = args[3]
+  other                 = args[4:]
 
   # Create a temporary pathset to reference the recab_table
   # output directory
   with tempfile.NamedTemporaryFile(mode='rwb') as tmp_pathset_file:
     try:
-      run_recab(conf_file, input_data, tmp_pathset_file.name, vcf, num_reducers, other)
+      run_recab(input_data, tmp_pathset_file.name, vcf, num_reducers, other)
       tmp_pathset_file.seek(0)
       out_paths = pathset.FilePathset.from_file(tmp_pathset_file)
       collect_table(out_paths, final_output)

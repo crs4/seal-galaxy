@@ -22,7 +22,7 @@
 <tool id="seal_merge_alignments" name="Merge Alignments" version="0.4.0-devel">
   <description>Merge a pathset of part-files of alignments into a single well-formatted SAM file</description>
   <command interpreter="python">
-		#set $ref_path = 'file://' + $reference.fields.path if $reference.fields.path.startswith('/') else $reference.fields.path
+    #set $ref_path = 'file://' + $reference.fields.path if $reference.fields.path.startswith('/') else $reference.fields.path
     merge_alignments.py
     $input_data
     $output
@@ -88,8 +88,8 @@
   </stdio>
 
   <help>
-		ReadSort is a Hadoop-based program for sorting reads by alignment position.
-	 	For the full help see the `manual &lt;http://biodoop-seal.sourceforge.net/read_sort_index.html&gt;`_.
+ReadSort is a Hadoop-based program for sorting reads by alignment position.
+For the full help see the `manual &lt;http://biodoop-seal.sourceforge.net/read_sort_index.html&gt;`_.
   </help>
 
 </tool>

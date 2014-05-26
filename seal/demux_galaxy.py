@@ -26,7 +26,6 @@ by Demux.
 """
 
 # parameters:
-#    GALAXY_DATA_INDEX_DIR
 #    INPUT_DATA
 #    MISMATCHES
 #    NEW_FILE_PATH
@@ -74,47 +73,41 @@ def usage_error(msg=None):
   if msg:
     print >> sys.stderr, msg
   print >> sys.stderr, "Usage:", os.path.basename(sys.argv[0]),\
-    "GALAXY_DATA_INDEX_DIR INPUT_DATA MISMATCHES NEW_FILE_PATH NUM_REDUCERS OUTPUT1 OUTPUT_ID SAMPLE_SHEET INPUT_FORMAT OUTPUT_FORMAT OUTPUT_COMPRESSION INDEX_PRESENT SEPARATE_READS"
+    "INPUT_DATA MISMATCHES NEW_FILE_PATH NUM_REDUCERS OUTPUT1 OUTPUT_ID SAMPLE_SHEET INPUT_FORMAT OUTPUT_FORMAT OUTPUT_COMPRESSION INDEX_PRESENT SEPARATE_READS"
   sys.exit(1)
 
 
 if __name__ == "__main__":
-  if len(sys.argv) != 14:
+  if len(sys.argv) != 13:
     usage_error()
 
-  galaxy_data_index_dir = sys.argv[1]
-  input_data         = sys.argv[2]
-  mismatches         = sys.argv[3]
-  new_file_path      = sys.argv[4]
-  num_reducers       = sys.argv[5]
-  output1            = sys.argv[6]
-  output_id          = sys.argv[7]
-  sample_sheet       = sys.argv[8]
-  input_format       = sys.argv[9]
-  output_format      = sys.argv[10]
-  output_compression = sys.argv[11]
-  index_present      = sys.argv[12]
-  separate_reads     = sys.argv[13]
+  input_data         = sys.argv[1]
+  mismatches         = sys.argv[2]
+  new_file_path      = sys.argv[3]
+  num_reducers       = sys.argv[4]
+  output1            = sys.argv[5]
+  output_id          = sys.argv[6]
+  sample_sheet       = sys.argv[7]
+  input_format       = sys.argv[8]
+  output_format      = sys.argv[9]
+  output_compression = sys.argv[10]
+  index_present      = sys.argv[11]
+  separate_reads     = sys.argv[12]
 
   mydir = os.path.abspath(os.path.dirname(__file__))
 
   # Run the demux program
   cmd = [
-      os.path.join(mydir, 'seal_galaxy.py'),
+      'hadoop_galaxy',
       '--input', input_data,
-      '--output', output1
-      ]
-  conf_file = os.path.join(galaxy_data_index_dir, 'seal_galaxy_conf.yaml')
-  if os.path.exists(conf_file):
-    cmd.extend( ('--conf', conf_file) )
-
-  cmd.append('seal_demux')
-
-  cmd.extend( (
-    '--sample-sheet', sample_sheet,
-    '--input-format', input_format,
-    '--output-format', output_format
-    ))
+      '--input-format', input_format, # --input-format for hadoop-galaxy
+      '--output', output1,
+      '--executable', 'seal',
+      'demux',
+      '--sample-sheet', sample_sheet,
+      '--input-format', input_format, # --input-format for seal demux
+      '--output-format', output_format
+    ]
   if re.match(r'\s*\d+\s*', num_reducers):
     cmd.extend( ('--num-reducers', num_reducers) )
 

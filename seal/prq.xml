@@ -21,16 +21,13 @@
 
 <tool id="seal_prq" name="Prq" version="0.4.0-devel">
   <description>Convert qseq or fastq files to prq on Hadoop</description>
-  <command interpreter="python">
-    seal_galaxy.py
-    #import os
-    #set $exists = os.path.exists(os.path.join($GALAXY_DATA_INDEX_DIR, "seal_galaxy_conf.yaml"))
-    #if $exists
-      --conf ${GALAXY_DATA_INDEX_DIR}/seal_galaxy_conf.yaml
-    #end if
+  <command>
+    hadoop_galaxy
     --input $input_data
+    --input-format $input_format.type
     --output $output1
-    seal_prq
+    --executable seal
+    prq
     --input-format $input_format.type
     --num-reducers $num_reducers
     -D hbam.qseq-input.base-quality-encoding=$input_format.bq_encoding

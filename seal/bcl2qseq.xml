@@ -22,16 +22,12 @@
 <tool id="dist_bcl2qseq" name="Dist Bcl2Qseq" version="0.1.0">
   <description>Convert Illumina bcl files to qseq on Hadoop</description>
 
-  <command interpreter="python">
-    seal_galaxy.py
-    #import os
-    #set $exists = os.path.exists(os.path.join($GALAXY_DATA_INDEX_DIR, "seal_galaxy_conf.yaml"))
-    #if $exists
-     --conf ${GALAXY_DATA_INDEX_DIR}/seal_galaxy_conf.yaml
-    #end if
+  <command>
+    hadoop_galaxy
+		--executable seal
     --input $input_data
     --output $output1
-    seal_dist_bcl2qseq
+    bcl2qseq
     #if $advanced.control == 'show'
       #if $advanced.bcl2qseq_bin:
       --bclToQseq-path $advanced.bcl2qseq_bin
@@ -40,15 +36,19 @@
       #if $advanced.additional_ld_path
       --append-ld-library-path $advanced.additional_ld_path
       #end if
+
       #if $advanced.ignore_missing_bcl
       --ignore-missing-bcl
       #end if
+
       #if $advanced.ignore_missing_control
       --ignore-missing-control
       #end if
+
       #if $advanced.exclude_controls
       --exclude-controls
       #end if
+
       #if $advanced.no_eamss
       --no-eamss
       #end if

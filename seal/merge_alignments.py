@@ -45,7 +45,7 @@ def main(args):
 
   with tempfile.NamedTemporaryFile() as header_file:
     print "generating header"
-    gen_header_cmd = [ 'seal_merge_alignments', '--header-only' ]
+    gen_header_cmd = [ 'seal', 'merge_alignments', '--header-only' ]
     gen_header_cmd.extend(args[2:])
     header_text = subprocess.check_output(gen_header_cmd)
 
@@ -65,6 +65,7 @@ def main(args):
       temp_pathset.flush()
 
       print "concatenating pathset"
+      # TODO:  Add ability to use dist_cat_paths
       cat_paths.main([temp_pathset.name, output_path])
       print "operation complete"
 

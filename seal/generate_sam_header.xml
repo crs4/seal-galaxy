@@ -23,7 +23,7 @@
   <description>Generate a SAM header for the given reference</description>
 
   <command interpreter="python">
-		#set $ref_path = 'file://' + $reference.fields.path if $reference.fields.path.startswith('/') else $reference.fields.path
+    #set $ref_path = 'file://' + $reference.fields.path if $reference.fields.path.startswith('/') else $reference.fields.path
     generate_sam_header.py
     --header-only
     --annotations ${ref_path}.ann
@@ -88,8 +88,8 @@
   </stdio>
 
   <help>
-		ReadSort is a Hadoop-based program for sorting reads by alignment position.
-	 	For the full help see the `manual &lt;http://biodoop-seal.sourceforge.net/read_sort_index.html&gt;`_.
+ReadSort is a Hadoop-based program for sorting reads by alignment position.
+For the full help see the `manual &lt;http://biodoop-seal.sourceforge.net/read_sort_index.html&gt;`_.
   </help>
 
 </tool>

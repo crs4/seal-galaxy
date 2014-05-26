@@ -21,18 +21,14 @@
 
 <tool id="seal_read_sort" name="ReadSort" version="0.4.0-devel">
   <description>Sort reads with Hadoop</description>
-  <command interpreter="python">
-		#set $ref_path = 'file://' + $reference.fields.path if $reference.fields.path.startswith('/') else $reference.fields.path
-    seal_galaxy.py
-    #import os
-    #set $exists = os.path.exists(os.path.join($GALAXY_DATA_INDEX_DIR, "seal_galaxy_conf.yaml"))
-    #if $exists
-      --conf ${GALAXY_DATA_INDEX_DIR}/seal_galaxy_conf.yaml
-    #end if
+  <command>
+    #set $ref_path = 'file://' + $reference.fields.path if $reference.fields.path.startswith('/') else $reference.fields.path
+    hadoop_galaxy
     --input $input_data
     --output $output
-    seal_read_sort
-		--annotations ${ref_path}.ann
+    --executable seal
+    read_sort
+    --annotations ${ref_path}.ann
     --num-reducers $num_reducers
   </command>
 
@@ -52,7 +48,7 @@
   </inputs>
 
   <outputs>
-    <data name="output" type="data" format="pathset" />
+    <data name="output" format="pathset" />
   </outputs>
 
   <stdio>
@@ -60,8 +56,8 @@
   </stdio>
 
   <help>
-		ReadSort is a Hadoop-based program for sorting reads by alignment position.
-	 	For the full help see the `manual &lt;http://biodoop-seal.sourceforge.net/read_sort_index.html&gt;`_.
+ReadSort is a Hadoop-based program for sorting reads by alignment position.
+For the full help see the `manual &lt;http://biodoop-seal.sourceforge.net/read_sort_index.html&gt;`_.
   </help>
 
 </tool>

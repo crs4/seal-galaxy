@@ -24,7 +24,6 @@
 
   <command interpreter="python">
     demux_galaxy.py
-    $GALAXY_DATA_INDEX_DIR
     $input_data
     $mismatches
     $__new_file_path__
