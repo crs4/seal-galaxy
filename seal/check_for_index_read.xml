@@ -32,7 +32,7 @@
   </inputs>
 
   <outputs>
-    <data name="output" type="data" />
+    <data name="output" />
   </outputs>
 
   <stdio>
