@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 
 <toolbox>
-  <section name="Sequencing pipeline" id="seq">
-		<tool file="seal-galaxy/seal/check_for_index_read.xml" />
-  </section>
   <section name="Seal" id="seal">
 		<tool file="seal-galaxy/seal/bcl2qseq.xml" />
     <tool file="seal-galaxy/seal/demux.xml" />
