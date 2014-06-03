@@ -24,7 +24,7 @@
 
   <command>
     hadoop_galaxy
-		--executable seal
+    --executable seal
     --input $input_data
     --output $output1
     bcl2qseq
