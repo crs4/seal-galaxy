@@ -3,58 +3,28 @@ Galaxy wrapper for the Seal toolkit
 ====================================
 
 These are the Galaxy wrappers for the Seal toolkit for Hadoop-based processing
-of sequencing data (http://biodoop-seal.sf.net).  At this point in time this is
-actually a code dump of the wrappers in use at CRS4.  They may contain
-customizations specific to our set-up and may not work out of the box in your
-installation.
-
-To use these, in addition to configuring Galaxy to see the tools you need to
-define two new data types by adding these two lines to the registration tag in
-datatypes_conf.xml:
-
-  <datatype extension="pathset" type="galaxy.datatypes.data:Text" subclass="True" display_in_upload="True"/>
-  <datatype extension="qseq" type="galaxy.datatypes.tabular:Qseq" display_in_upload="true" />
+of sequencing data (http://biodoop-seal.sf.net).
 
 
 Hadoop-Galaxy integration
 ----------------------------
 
-The Hadoop-Galaxy integration used here is rather simple.  It works by adding a layer of
-indirection, thus letting Galaxy handle "pathset" files which contain a list of
-paths pointing to the actual data -- which may lie on any file system, including
-HDFS.  This trick is implemented in seal_galaxy.py.  This script is called by
-Galaxy and in turn calls the actual Seal tool. In this step, seal_galaxy.py
-reads the pathset file received from Galaxy, extracts the actual data paths and
-passes them to the Hadoop-based tool.  Analogously, it write the Seal output
-path to a pathset file in Galaxy's data space.
-
-In its current form the integration code is not very configurable nor flexible.
-It could use some attention; as usual, patches are welcome.  It assumes that the
-Hadoop environment is 
-
-Note that a few utilities are provided to manipulate pathset files directly from
-Galaxy.  You can create them, split them and concatenate the data they reference
-into a single file (though this last script is somewhat slow and deserves to be
-rewritten).
-
+These wrappers use the [Hadoop-Galaxy](https://github.com/crs4/hadoop-galaxy)
+tool to implement the integration between Hadoop and Galaxy.  You should have a
+look at its documentation.
 
 An important issue
 .......................
 
-An implication of the layer of indirection is that Galaxy knows nothing about
-your actual data. Because of this, removing the Galaxy datasets does not delete
-the files produced by your Hadoop runs, potentially resulting in the waste of a
-lot of space.  In addition, as typical with pointers you can end up in
-situations where multiple pathsets point to the same data, or where they point
-to data that you want to access from Hadoop but would not want to delete (e.g.,
-your run directories).
+An implication of the integration provided by Hadoop-Galaxy is that Galaxy
+knows nothing about your actual data. Because of this, removing the Galaxy
+datasets does not delete the files produced by your Hadoop runs, potentially
+resulting in the waste of a lot of space.  Also, be careful with situations
+where you may end up with multiple pathsets pointing to the same data, or where
+they point to data that you want to access from Hadoop but would not want to
+delete (e.g., your run directories).
 
-A proper solution would include a garbage collection system to be run with
-Galaxy's clean up action, but we haven't implemented this yet.  Instead, at the
-moment we handle this issue as follows.  Since we only use Hadoop for
-intermediate steps in our pipeline, we don't permanently store any of its
-output.  So, we write this data to a temporary storage space.  From time to
-time, we stop the pipeline and remove the entire contents.
+Have a look at the Hadoop-Galaxy README for more details.
 
 
 Authors
