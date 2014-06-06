@@ -2,13 +2,13 @@
 
 <toolbox>
   <section name="Seal" id="seal">
-		<tool file="seal-galaxy/seal/bcl2qseq.xml" />
-    <tool file="seal-galaxy/seal/demux.xml" />
-    <tool file="seal-galaxy/seal/prq.xml" />
-    <tool file="seal-galaxy/seal/seqal.xml" />
-    <tool file="seal-galaxy/seal/read_sort.xml" />
-    <tool file="seal-galaxy/seal/merge_alignments.xml" />
-    <tool file="seal-galaxy/seal/recab_table.xml" />
-    <tool file="seal-galaxy/seal/generate_sam_header.xml" />
+		<tool file="seal_galaxy/seal/bcl2qseq.xml" />
+    <tool file="seal_galaxy/seal/demux.xml" />
+    <tool file="seal_galaxy/seal/prq.xml" />
+    <tool file="seal_galaxy/seal/seqal.xml" />
+    <tool file="seal_galaxy/seal/read_sort.xml" />
+    <tool file="seal_galaxy/seal/merge_alignments.xml" />
+    <tool file="seal_galaxy/seal/recab_table.xml" />
+    <tool file="seal_galaxy/seal/generate_sam_header.xml" />
   </section>
 </toolbox>
