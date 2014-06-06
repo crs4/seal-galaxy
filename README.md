@@ -14,7 +14,7 @@ tool to implement the integration between Hadoop and Galaxy.  You should have a
 look at its documentation.
 
 An important issue
-.......................
+-----------------------
 
 An implication of the integration provided by Hadoop-Galaxy is that Galaxy
 knows nothing about your actual data. Because of this, removing the Galaxy
