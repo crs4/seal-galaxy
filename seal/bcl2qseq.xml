@@ -21,6 +21,10 @@
 
 <tool id="dist_bcl2qseq" name="Dist Bcl2Qseq" version="0.1.0">
   <description>Convert Illumina bcl files to qseq on Hadoop</description>
+  <requirements>
+    <requirement type="package" version="0.11">pydoop</requirement>
+    <requirement type="package" version="0.1.1">hadoop-galaxy</requirement>
+  </requirements>
 
   <command>
     hadoop_galaxy

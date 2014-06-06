@@ -21,6 +21,10 @@
 
 <tool id="seal_read_sort" name="ReadSort" version="0.4.0-devel">
   <description>Sort reads with Hadoop</description>
+  <requirements>
+    <requirement type="package" version="0.11">pydoop</requirement>
+    <requirement type="package" version="0.1.1">hadoop-galaxy</requirement>
+  </requirements>
   <command>
     #set $ref_path = 'file://' + $reference.fields.path if $reference.fields.path.startswith('/') else $reference.fields.path
     hadoop_galaxy

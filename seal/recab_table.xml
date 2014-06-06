@@ -21,6 +21,10 @@
 
 <tool id="seal_recab_table" name="Recab Table" version="0.4.0-devel">
   <description>Calculate a base quality recalibration table on Hadoop.</description>
+  <requirements>
+    <requirement type="package" version="0.11">pydoop</requirement>
+    <requirement type="package" version="0.1.1">hadoop-galaxy</requirement>
+  </requirements>
 
   <command interpreter="python">
     recab_table_galaxy.py
