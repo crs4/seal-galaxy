@@ -2,10 +2,12 @@
 <tool_dependency>
   <package name="pydoop" version="0.11">
     <repository name="package_pydoop_0_11" owner="crs4" prior_installation_required="True" />
+    <!--<repository name="package_pydoop_0_11" owner="ilveroluca" prior_installation_required="True" />-->
   </package>
 
   <package name="hadoop-galaxy" version="0.1.1">
     <repository name="hadoop_galaxy" owner="crs4" prior_installation_required="True" />
+    <!--<repository name="hadoop_galaxy" owner="soranzo" prior_installation_required="True" />-->
   </package>
 
   <package name="seal-galaxy" version="0.1.0">
@@ -15,9 +17,11 @@
         <action type="shell_command">git reset --hard master</action>
         <action type="set_environment_for_install">
           <repository name="package_pydoop_0_11" owner="crs4">
+          <!--<repository name="package_pydoop_0_11" owner="ilveroluca">-->
             <package name="pydoop" version="0.11" />
           </repository>
           <repository name="hadoop_galaxy" owner="crs4" prior_installation_required="True">
+          <!--<repository name="hadoop_galaxy" owner="soranzo" prior_installation_required="True">-->
             <package name="hadoop-galaxy" version="0.1.1"/>
           </repository>
         </action>

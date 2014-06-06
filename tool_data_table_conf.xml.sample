@@ -1,0 +1,16 @@
+<tables>
+    <table name="bwa_0510_indices" comment_char="#">
+        <columns>name, value, path</columns>
+        <!--<file path="tool-data/bwa_0510_indices.loc" />-->
+    </table>
+
+    <table name="seqal_indexes" comment_char="#">
+        <columns>name, value, path</columns>
+        <!--<file path="tool-data/bwa_0510_indices.loc" />-->
+    </table>
+
+    <table name="variant_tables" comment_char="#">
+        <columns>name, value, path</columns>
+        <!--<file path="tool-data/bwa_0510_indices.loc" />-->
+    </table>
+</tables>
