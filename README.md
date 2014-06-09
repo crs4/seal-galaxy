@@ -13,7 +13,7 @@ You can install the Seal-Galaxy wrappers through the Galaxy toolshed or like
 any other Galaxy tool.  However, note that the wrappers don't include Seal
 itself; you need to install it separately.
 
-The wrappers assume that the `seal` executable is found in the PATH.  The
+The wrappers assume that the `seal` executable is found in the PATH.  To
 install Seal refer directly to [its
 documentation](http://biodoop-seal.sourceforge.net/installation.html).
 
