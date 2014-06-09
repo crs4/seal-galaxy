@@ -6,6 +6,17 @@ These are the Galaxy wrappers for the Seal toolkit for Hadoop-based processing
 of sequencing data (http://biodoop-seal.sf.net).
 
 
+Installation
+-------------------
+
+You can install the Seal-Galaxy wrappers through the Galaxy toolshed or like
+any other Galaxy tool.  However, note that the wrappers don't include Seal
+itself; you need to install it separately.
+
+The wrappers assume that the `seal` executable is found in the PATH.  The
+install Seal refer directly to [its
+documentation](http://biodoop-seal.sourceforge.net/installation.html).
+
 Hadoop-Galaxy integration
 ----------------------------
 
