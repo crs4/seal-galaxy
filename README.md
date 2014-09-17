@@ -10,11 +10,20 @@ Installation
 -------------------
 
 You can install the Seal-Galaxy wrappers through the Galaxy toolshed or like
-any other Galaxy tool.  However, note that the wrappers don't include Seal
-itself; you need to install it separately.
+any other Galaxy tool.  The installation process will try to fetch and build
+Seal and some of its dependencies.  However, you'll need to make sure that
+the build process can find any required headers, libraries and executables,
+such as:
 
-The wrappers assume that the `seal` executable is found in the PATH.  To
-install Seal refer directly to [its
+* javac
+* protobuf
+* maven
+* ant
+* zlib
+* git
+* hadoop
+  
+For details on Seal's installation process refer directly to [its
 documentation](http://biodoop-seal.sourceforge.net/installation.html).
 
 Hadoop-Galaxy integration
