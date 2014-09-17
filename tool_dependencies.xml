@@ -1,10 +1,8 @@
 <?xml version="1.0"?>
 <tool_dependency>
-  <package name="pydoop" version="0.11">
-    <repository name="package_pydoop_0_11" owner="crs4" />
+  <package name="hadoop-galaxy" version="0.1.1">
+    <repository name="hadoop_galaxy" owner="crs4" prior_installation_required="True" />
   </package>
 
-  <package name="hadoop-galaxy" version="0.1.1">
-    <repository name="hadoop_galaxy" owner="crs4" />
   </package>
 </tool_dependency>
