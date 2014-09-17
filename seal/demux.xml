@@ -22,6 +22,7 @@
 <tool id="seal_demux" name="Demux" version="0.4.0-devel" force_history_refresh="True">
   <description>Demultiplex Illumina runs on Hadoop</description>
   <requirements>
+    <requirement type="package" version="master_13986416">seal</requirement>
     <requirement type="package" version="0.11">pydoop</requirement>
     <requirement type="package" version="0.1.1">hadoop-galaxy</requirement>
   </requirements>

@@ -22,6 +22,7 @@
 <tool id="generate_sam_header" name="Generate SAM header" version="0.1.0">
   <description>Generate a SAM header for the given reference</description>
   <requirements>
+    <requirement type="package" version="master_13986416">seal</requirement>
     <requirement type="package" version="0.11">pydoop</requirement>
     <requirement type="package" version="0.1.1">hadoop-galaxy</requirement>
   </requirements>

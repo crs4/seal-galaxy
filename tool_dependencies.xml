@@ -4,5 +4,39 @@
     <repository name="hadoop_galaxy" owner="crs4" prior_installation_required="True" />
   </package>
 
+  <package name="seal" version="master_13986416">
+    <install version="1.0">
+      <actions>
+        <action type="shell_command">git clone https://github.com/crs4/seal.git</action>
+        <action type="shell_command">git checkout master</action>
+        <action type="shell_command">git reset --hard 13986416aa79561bd0102cb7ccc1e0668ac9f0a4</action>
+        <!--<action type="download_by_url">https://github.com/crs4/seal/archive/0.4.0-rc2.tar.gz</action>-->
+        <action type="set_environment_for_install">
+          <environment_variable name="PYTHONPATH" action="prepend_to">$INSTALL_DIR/lib/python</environment_variable>
+        </action>
+        <action type="make_directory">$INSTALL_DIR/lib/python</action>
+        <action type="shell_command">python setup.py build_hadoop_bam</action>
+        <action type="shell_command">python setup.py install --prefix=$INSTALL_DIR --install-lib=$INSTALL_DIR/lib/python</action>
+        <action type="set_environment">
+          <environment_variable action="prepend_to" name="PATH">$INSTALL_DIR/bin</environment_variable>
+          <environment_variable action="prepend_to" name="PYTHONPATH">$INSTALL_DIR/lib/python</environment_variable>
+        </action>
+      </actions>
+    </install>
+    <readme>
+This package has a number of dependencies that need to be installed before it:
+
+* Pydoop needs to be installed (it will be pulled down as a dependency; see
+that package's instructions for it's own installation pointers)
+
+* Hadoop-BAM ver. 6.2 or later (https://github.com/HadoopGenomics/Hadoop-BAM) needs to be
+compiled and accessible at the path referenced by the HADOOP_BAM environment variable.
+
+* protobuf-python
+
+* JDK and Ant (ant version at least version 1.7)
+
+Please see http://biodoop-seal.sourceforge.net/installation_dependencies.html for more details.
+    </readme>
   </package>
 </tool_dependency>
