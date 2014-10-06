@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <tool_dependency>
-  <package name="hadoop-galaxy" version="0.1.1">
+  <package name="hadoop-galaxy" version="0.1.3">
     <repository name="hadoop_galaxy" owner="crs4" prior_installation_required="True" />
   </package>
 

@@ -24,7 +24,7 @@
   <requirements>
     <requirement type="package" version="master_13986416">seal</requirement>
     <requirement type="package" version="0.11">pydoop</requirement>
-    <requirement type="package" version="0.1.1">hadoop-galaxy</requirement>
+    <requirement type="package" version="0.1.3">hadoop-galaxy</requirement>
   </requirements>
   <command>
     #set $ref_path = 'file://' + $reference.fields.path if $reference.fields.path.startswith('/') else $reference.fields.path
