@@ -4,7 +4,7 @@
     <repository name="hadoop_galaxy" owner="crs4" prior_installation_required="True" />
   </package>
 
-  <package name="seal" version="master_13986416">
+  <package name="seal" version="13986416aa79561bd0102cb7ccc1e0668ac9f0a4">
     <install version="1.0">
       <actions>
         <action type="shell_command">git clone https://github.com/crs4/seal.git</action>
