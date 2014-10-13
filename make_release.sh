@@ -3,6 +3,7 @@
 #set -x
 set -o errexit
 set -o nounset
+set -o pipefail
 
 PackageName="seal-galaxy"
 
@@ -15,7 +16,10 @@ function error() {
 }
 
 function usage_error() {
-    error  "Usage: $0 [ Seal revid ]"
+    echo "Usage: $0 version"
+    echo "Specify version as a git revid (id or tag) for the Seal repository, and " >&2
+    echo "optionally a '-n' suffix for the wrapper version; e.g., 0.4.1, 0.4.1-1, 0.4.1-2" >&2
+    error
 }
 
 function confirm() {
@@ -55,27 +59,31 @@ function rewrite_seal_version() {
 ############# main ###############3
 
 if [ $# -eq 1 ]; then
-    seal_version="${1}"
+    wrapper_version="${1}"
 else
     usage_error
 fi
 
-echo "Will rewrite tool_dependencies.xml setting the the package version to '${seal_version}'."
+echo "Will rewrite tool_dependencies.xml setting the the package version to '${wrapper_version}'."
 confirm "Are you sure you want to proceed? [Y/n]"
 
 # ensure the tag doesn't already exist
-if git tag -l | grep -w "${seal_version}" ; then
-    error "A release tag called '${seal_version}' already exists"
+if git tag -l | grep -w "${wrapper_version}" ; then
+    error "A release tag called '${wrapper_version}' already exists"
 fi
+
+# remove the wrapper suffix, if it's there
+seal_version=$(echo ${wrapper_version} | sed -e 's/-[^-]\+$//')
+echo "Using seal version ${seal_version}"
 
 rewrite_seal_version "${seal_version}"
 
 git commit -a -m "Wrappers release for Seal '${seal_version}'"
-git tag "${seal_version}"
+git tag "${wrapper_version}"
 
 revid=$(git rev-parse HEAD)
 
-echo "Tagged new commit ${revid} with tag '${seal_version}'"
+echo "Tagged new commit ${revid} with tag '${wrapper_version}'"
 
 short_revid=${revid::8}
 archive_name=${PackageName}-${short_revid}.tar.gz
