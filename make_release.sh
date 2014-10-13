@@ -78,7 +78,7 @@ echo "Using seal version ${seal_version}"
 
 rewrite_seal_version "${seal_version}"
 
-git commit -a -m "Wrappers release for Seal '${seal_version}'"
+git commit -a --allow-empty -m "Wrappers release for Seal '${seal_version}'"
 git tag "${wrapper_version}"
 
 revid=$(git rev-parse HEAD)
