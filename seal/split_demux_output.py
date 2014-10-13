@@ -25,7 +25,7 @@ import sys
 
 import pydoop.hdfs as phdfs
 
-from pathset import FilePathset
+from hadoop_galaxy.pathset import FilePathset
 
 Debug = os.environ.get('DEBUG', None)
 logging.basicConfig(level=logging.DEBUG if Debug else logging.INFO)

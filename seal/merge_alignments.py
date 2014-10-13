@@ -24,8 +24,8 @@ import subprocess
 import sys
 import tempfile
 
-import pathset
-import cat_paths
+import hadoop_galaxy.pathset as pathset
+import hadoop_galaxy.cat_paths as cat_paths
 
 def usage_error(msg=None):
   if msg:
