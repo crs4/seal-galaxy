@@ -29,9 +29,6 @@ This package has a number of dependencies that need to be installed before it:
 * Pydoop needs to be installed (it will be pulled down as a dependency; see
 that package's instructions for it's own installation pointers)
 
-* Hadoop-BAM ver. 6.2 or later (https://github.com/HadoopGenomics/Hadoop-BAM) needs to be
-compiled and accessible at the path referenced by the HADOOP_BAM environment variable.
-
 * protobuf-python
 
 * JDK and Ant (ant version at least version 1.7)
