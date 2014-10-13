@@ -38,22 +38,22 @@ function confirm() {
 }
 
 function rewrite_seal_version() {
-	local grep_expr='<package name="seal" version=".*">'
-	if ! grep  "${grep_expr}" tool_dependencies.xml >/dev/null ; then
-			error "Couldn't find expected package line in tool_dependencies.xml"
-	fi
+  local grep_expr='<package name="seal" version=".*">'
+  if ! grep  "${grep_expr}" tool_dependencies.xml >/dev/null ; then
+    error "Couldn't find expected package line in tool_dependencies.xml"
+  fi
 
-	printf -v sed_expr1  '/<package name="seal"/s/version="[^"]*"/version="%s"/' "${seal_version}"
-	printf -v sed_expr2  '/<action type="shell_command">/s/git reset --hard \([^<]\+\)\s*/git reset --hard %s/' "${seal_version}"
-	sed -i -e "${sed_expr1}" -e "${sed_expr2}" tool_dependencies.xml
-	echo "Edited tool_dependencies.xml" >&2
+  printf -v sed_expr1  '/<package name="seal"/s/version="[^"]*"/version="%s"/' "${seal_version}"
+  printf -v sed_expr2  '/<action type="shell_command">/s/git reset --hard \([^<]\+\)\s*/git reset --hard %s/' "${seal_version}"
+  sed -i -e "${sed_expr1}" -e "${sed_expr2}" tool_dependencies.xml
+  echo "Edited tool_dependencies.xml" >&2
 
-	# edit the tools as well
-	printf -v sed_expr3 '/<requirement type="package" version=.*>\s*seal\s*</s/version="[^"]\+"/version="%s"/' "${seal_version}"
-	printf -v sed_expr4 '/<tool id=/s/version="[^"]\+"/version="%s"/' "${seal_version}"
-	sed -i -e "${sed_expr3}" -e "${sed_expr4}" seal/*.xml
+  # edit the tools as well
+  printf -v sed_expr3 '/<requirement type="package" version=.*>\s*seal\s*</s/version="[^"]\+"/version="%s"/' "${seal_version}"
+  printf -v sed_expr4 '/<tool id=/s/version="[^"]\+"/version="%s"/' "${seal_version}"
+  sed -i -e "${sed_expr3}" -e "${sed_expr4}" seal/*.xml
 
-	echo "Edited tool definitions" >&2
+  echo "Edited tool definitions" >&2
 }
 
 ############# main ###############3
